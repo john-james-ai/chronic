@@ -35,6 +35,7 @@ knitr::knit_hooks$set(inline = function(x) {
 
 ```{r loadData, cache=TRUE}
 load("../data/brfss2013.RData")
+load("../R/sysdata.rda")
 ```
 
 ```{r loadFunctions}
@@ -57,27 +58,27 @@ source("../R/analyzeRq3.R")
 source("../R/analyzeRq4.R")
 ```
 
-```{r preprocessData, echo = F, include=T,  results='html'}
+```{r preprocessData, echo = F, cache = T}
 brfss <- preProcessData(brfss2013)
 ```   
 
-```{r univariateAnalysis, echo = F}
+```{r univariateAnalysis, echo = F, cache = T}
 univariate <- analyzeUnivariate(brfss)
 ``` 
 
-```{r analyzeRq1, echo = F}
+```{r analyzeRq1, echo = F, cache = T}
 rq1 <- analyzeRq1(brfss)
 ``` 
 
-```{r rq2, include=T, echo = F, results='asis'}
+```{r rq2, include=T, echo = F, cache = T}
 rq2 <- analyzeRq2(brfss)  
 ``` 
 
-```{r analyzeRq3, echo = F}
+```{r analyzeRq3, echo = F, cache = T}
 rq3 <- analyzeRq3(brfss)
 ``` 
 
-```{r analyzeRq4, echo = F}
+```{r analyzeRq4, echo = F, cache = T}
 rq4 <- analyzeRq4(brfss)
 ``` 
 
@@ -354,14 +355,14 @@ The combined response rate of the Depression and Income variables was `r round(r
 
 <center>
 `r kfigr::figr(label = "rq1IncomeFreqTable", prefix = TRUE, link = TRUE, type="Table")`: Marginal contingency table of frequencies of depression diagnoses by income level
-```{r rq1IncomeFreqTable, include=T, echo = F, results='asis'}
-stargazer::stargazer(format(rq1$tables$incomeFreq, quote = FALSE, justify = "right", big.mark = ","))
+```{r rq1IncomeFreqTable, echo = F, results='asis'}
+stargazer::stargazer(format(rq1$tables$incomeFreq, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
 ``` 
 </center>
 
 <center>
 `r kfigr::figr(label = "rq1IncomePropTable", prefix = TRUE, link = TRUE, type="Table")`: Marginal contingency table of proportions of depression diagnoses by income level
-```{r rq1IncomePropTable, include=T, echo = F, results='asis'}
+```{r rq1IncomePropTable, echo = F, results='asis'}
 stargazer::stargazer(format(rq1$tables$incomeProp, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
 ``` 
 </center>
@@ -581,7 +582,7 @@ The combined response rate of the income, education, and depression variables wa
 <center>
 `r kfigr::figr("rq1InteractionFreqTable", prefix = TRUE,  link = TRUE, type = "Table")`: Contingency table of frequencies of depression diagnoses by income and education levels
 ```{r rq1InteractionFreqTable, include=T, echo = F, results='asis'}
-stargazer::stargazer(format(rq1$tables$jointFreq, quote = FALSE, justify = "right", big.mark = ","))
+stargazer::stargazer(format(rq1$tables$jointFreq, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
 ``` 
 </center>
 
@@ -1049,7 +1050,7 @@ Diagnoses of depression have been shown to occur among 73% of those who also rep
 ## Depression and Productivity
 Depression had a slightly greater marginal effect on productivity, than did chronic illness. Fifty-eight percent of those reporting a diagnosis of chronic disease also reported depression. Moreover, those that indicated both diagnoses reported on average `r round((rq3$stats$interaction$Mean[1] / rq3$stats$interaction$Mean[4] * 100) - 100,0)`% more sick days (`r rq3$stats$interaction$Mean[1]` days) than those without any diagnosis of depression or chronic illness (`r rq3$stats$interaction$Mean[4]` days) and `r round((rq3$stats$interaction$Mean[1] / mean(rq3$stats$interaction$Mean[2],rq3$stats$interaction$Mean[3])* 100) - 100,1)`% greater than those with a diagnosis of depression or chronic illness, but not both (~`r mean(rq3$stats$interaction$Mean[2],rq3$stats$interaction$Mean[3])` days).  Clearly, those with  co-occurring diagnoses of depression and chronic illness suffer significantly greater loss of productivity. Studies such as [@Egede2007] that illuminate the co-occurring relationships between depression, chronic illness and loss of productivity have and will continue to inform practices and policies aimed at reducing the personal and societal loss in productivity.
 
-## Depression and Use of health care Services
+## Depression and Use of Health Care Services
 Depression also had a slightly greater marginal effect on the use of health care services, than did chronic illness. Those with a diagnosis of depression had on average `r round((rq4$stats$depression$Mean[1] / rq4$stats$chronic$Mean[1] * 100) -100, 1)`% more doctors visits during the 12 months preceding the survey, than those with a diagnosis of one or more chronic illnesses (`r format(rq4$stats$depression$Mean[1],nsmall = 2)` vs. `r round(rq4$stats$chronic$Mean[1],2)`), second only to those with a diagnosis of kidney disease. Two reasons may account for this difference.  First, kidney dialysis is a non-negotiable aspect of treatment for some with kidney disease. Second, this study didn't control for access to health services via insurance; therefore, those with depression and no insurance may report less frequent use of health services.  Those with diagnoses of depression, with chronic illness reported on average `r round((rq4$stats$interaction$Mean[1] / rq4$stats$interaction$Mean[4] * 100) - 100,0)`% more doctors visits (`r rq4$stats$interaction$Mean[1]` visits) than those without any diagnosis of depression or chronic illness (`r rq4$stats$interaction$Mean[4]` visits) and `r round((rq4$stats$interaction$Mean[1] / mean(rq4$stats$interaction$Mean[2],rq4$stats$interaction$Mean[3])* 100) - 100,1)`% greater than those with a diagnosis of depression or chronic illness, but not both (~`r mean(rq4$stats$interaction$Mean[2],rq4$stats$interaction$Mean[3])` visits).  Like productivity, the use of health care services increased dramatically for those with co-occurring depression and chronic disease. Studies such as [@Egede2007] and [Katon2002] illuminate the co-occurring relationships between depression, chronic illness and health care utilization.
 
 # Conclusion
