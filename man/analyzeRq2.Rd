@@ -22,5 +22,5 @@ Function that performs the analysis for research question #2:  Is there a
 relationship between depression and chronic illness?
 }
 \author{
-John James, \email{jjames@dataference.com}
+John James, \email{jjames@datasciencestudio.org}
 }

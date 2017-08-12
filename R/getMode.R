@@ -10,7 +10,7 @@
 #'
 #' @param v - vector of numbers
 #' @return mode - Numeric, the most frequently occurring value
-#' @author John James, \email{jjames@@dataference.com}
+#' @author John James, \email{jjames@@datasciencestudio.org}
 #' @export
 getMode <- function(v) {
   uniqv <- unique(v)

@@ -13,7 +13,7 @@
 #' Surveillance System (BRFSS) telephone survey.
 #' @return analysis List containing frequency and proportion data, plots,
 #'     and statistical tests.
-#' @author John James, \email{jjames@@dataference.com}
+#' @author John James, \email{jjames@@datasciencestudio.org}
 #' @export
 analyzeRq2 <- function(brfss) {
   #---------------------------------------------------------------------------#
@@ -86,7 +86,6 @@ analyzeRq2 <- function(brfss) {
   #                           Conduct Tests                                   #
   #---------------------------------------------------------------------------#
   # Conduct chi-square test of independence of
-  message(paste("r2freqtbl", r2FreqTbl))
   r2X2 <- stats::chisq.test(r2FreqTbl)
   r2Assoc <- vcd::assocstats(r2FreqTbl)
 

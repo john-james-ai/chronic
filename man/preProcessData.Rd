@@ -19,5 +19,5 @@ brfss Data frame containing variables required for downstream analysis
 This function preprocesses the BRFSS data for downstream analysis.
 }
 \author{
-John James, \email{jjames@dataference.com}
+John James, \email{jjames@datasciencestudio.org}
 }

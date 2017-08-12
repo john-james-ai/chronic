@@ -20,5 +20,5 @@ This function performs the univariate analysis of categorical and quantitative
 variables.
 }
 \author{
-John James, \email{jjames@dataference.com}
+John James, \email{jjames@datasciencestudio.org}
 }

@@ -27,7 +27,7 @@ knitr::opts_chunk$set(echo=FALSE,
                comment=NA,
                message=FALSE,
                warning=FALSE)
-knitr::opts_knit$set(width=100, kfigr.prefix = T, kfigr.link = T)
+knitr::opts_knit$set(width=100, figr.prefix = T, figr.link = T)
 knitr::knit_hooks$set(inline = function(x) {
   prettyNum(x, big.mark=",")
 })
@@ -35,6 +35,26 @@ knitr::knit_hooks$set(inline = function(x) {
 
 ```{r loadData, cache=TRUE}
 load("../data/brfss2013.RData")
+```
+
+```{r loadFunctions}
+knitr::read_chunk("../R/getMode.R")
+knitr::read_chunk("../R/estimateSampleSize.R")
+knitr::read_chunk("../R/preProcessData.R")
+knitr::read_chunk("../R/analyzeUnivariate.R")
+knitr::read_chunk("../R/analyzeRq1.R")
+knitr::read_chunk("../R/analyzeRq2.R")
+knitr::read_chunk("../R/analyzeRq3.R")
+knitr::read_chunk("../R/analyzeRq4.R")
+
+source("../R/getMode.R")
+source("../R/estimateSampleSize.R")
+source("../R/preProcessData.R")
+source("../R/analyzeUnivariate.R")
+source("../R/analyzeRq1.R")
+source("../R/analyzeRq2.R")
+source("../R/analyzeRq3.R")
+source("../R/analyzeRq4.R")
 ```
 
 ```{r preprocessData, echo = F, include=T,  results='html'}
@@ -50,7 +70,7 @@ rq1 <- analyzeRq1(brfss)
 ``` 
 
 ```{r rq2, include=T, echo = F, results='asis'}
-rq2 <- analyzeRq2(brfss)
+rq2 <- analyzeRq2(brfss)  
 ``` 
 
 ```{r analyzeRq3, echo = F}
@@ -99,10 +119,10 @@ This research question examined the degree of co-occurrence of depression and ch
 
 The response variable was the diagnosis of depression and the diagnosis of a chronic illness explanatory variable, which was set to  "Yes" if any of the following variables were set to "Yes."
 
-`r figr("chronic", TRUE, type="Table")`: Chronic conditions evaluated in this study
-```{r chronic, echo = F, message = FALSE, warning=FALSE}
-kable(chronic) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
+`r kfigr::figr(label = "chronicTbl", prefix = TRUE, link = TRUE, type="Table")`: Chronic conditions evaluated in this study
+```{r chronicTbl, echo = F, message = FALSE, warning=FALSE}
+knitr::kable(chronic) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
 ```
 
 ### Research Question #3: Depression, Chronic Illness and Loss of Productivity 
@@ -143,23 +163,23 @@ States conducted telephone interviews during daytime and evening hours, seven da
 ### Data Variables
 The following table lists the variables used as well as any "derived" variables created for the analysis.
 
-`r figr("variables", TRUE, type="Table")`: BRFSS variables used in the study
-```{r variables, echo = F, message = FALSE, warning=FALSE}
-kable(variables) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
+`r kfigr::figr(label = "variableTbl", prefix = TRUE, link = TRUE, type="Table")`: BRFSS variables used in the study
+```{r variableTbl, echo = F, message = FALSE, warning=FALSE}
+knitr::kable(variables) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
 ```
 
 ### Data Preprocessing
 After reducing the data set from 330 variables to 15, two new variables were coded. The dichotomous 'Chronic' variable indicated a diagnosis of one or more chronic conditions. The dichotomous 'SickDaysInd' variable indicated that one or more sick days were reported.
 
 ### Power Analysis 
-Variable and partial response rates may have affected sample size. To ensure that readers could rely upon non-significant results, this analyst conducted several power analyses using the pwr package [@Ekstrom2017]. Each test indicated the minimum sample size required to detect a small effect of 0.1, with the $p < .05$ probability of a type I error of p < .05 and power of 0.8. `r figr("power", TRUE, type="Table")` summarizes the minimum required sample size ($N$) for each type of statistical test to be conducted.
+Variable and partial response rates may have affected sample size. To ensure that readers could rely upon non-significant results, this analyst conducted several power analyses using the pwr package [@Ekstrom2017]. Each test indicated the minimum sample size required to detect a small effect of 0.1, with the $p < .05$ probability of a type I error of p < .05 and power of 0.8. `r kfigr::figr(label = "powerTbl", prefix = TRUE, link = TRUE, type="Table")` summarizes the minimum required sample size ($N$) for each type of statistical test to be conducted.
 
-`r figr("power", TRUE, type="Table")`: Sample Size Estimates from Power Analysis
-```{r power, include=T, echo = F, results='html'}
+`r kfigr::figr(label = "powerTbl", prefix = TRUE, link = TRUE, type="Table")`: Sample Size Estimates from Power Analysis
+```{r powerTbl, include=T, echo = F, results='html'}
 power <- estimateSampleSize()
-kable(power, digits = 2) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = T, position = "center")
+knitr::kable(power, digits = 2) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = T, position = "center")
 ``` 
 
 ## Data Analysis
@@ -169,12 +189,12 @@ The study involved both descriptive and inferential statistics.
 The study began with a univariate analysis of the sample variables of interest.  For the categorical variables, response rates, proportions and frequency counts were calculated and presented in tables and bar plots. Population proportions were estimated using one-proportion z-tests. For quantitative variables, ranges, medians, means, modes, quartiles, skewness, kurtosis, standard deviations, standard errors and extreme values were obtained and presented in tables, box plots, and histograms/density plots.
 
 ### Inferential Statistics
-One-proportion z-tests were conducted to ascertain the differences between observed rates of depression and chronic illness, and the hypothesized rates from literature. The marginal associations between income and education and the prevalence of depression and the association between depression and chronic illness diagnoses were evaluated using chi-squared equality of proportions tests. The Cochran-Mantel Haenszel test evaluated the conditional association of income on depression, controlling for education. Since the quantitative variables departed significantly from normality, non-parametric Mann-Whitney-Wilcoxon tests [@Mann] and Kruskal-Wallis [@Kruskal1952] tests were administered to determine the marginal and joint effects of depression and chronic illness on the mean number of sick days and Dr. visits reported. Odds ratios indicated the strength of association between categorical variables.  Association tests using the Cramer's V statistic were administered to measure the effect sizes on categorical response variables. The Cramer's D statistic, provided by the Kolmogorov-Smirnov test, estimated effect sizes on quantitative variables. The $\alpha$ significance level was uniformly set to .05 for all statistical tests. `r figr("inferentials", TRUE, type="Table")` summarizes the inferential techniques employed in this analysis. 
+One-proportion z-tests were conducted to ascertain the differences between observed rates of depression and chronic illness, and the hypothesized rates from literature. The marginal associations between income and education and the prevalence of depression and the association between depression and chronic illness diagnoses were evaluated using chi-squared equality of proportions tests. The Cochran-Mantel Haenszel test evaluated the conditional association of income on depression, controlling for education. Since the quantitative variables departed significantly from normality, non-parametric Mann-Whitney-Wilcoxon tests [@Mann] and Kruskal-Wallis [@Kruskal1952] tests were administered to determine the marginal and joint effects of depression and chronic illness on the mean number of sick days and Dr. visits reported. Odds ratios indicated the strength of association between categorical variables.  Association tests using the Cramer's V statistic were administered to measure the effect sizes on categorical response variables. The Cramer's D statistic, provided by the Kolmogorov-Smirnov test, estimated effect sizes on quantitative variables. The $\alpha$ significance level was uniformly set to .05 for all statistical tests. `r kfigr::figr(label = "inferentials", prefix = TRUE, link = TRUE, type="Table")` summarizes the inferential techniques employed in this analysis. 
 
-`r figr("inferentials", TRUE, type="Table")`: Inferential Techniques
+`r kfigr::figr(label = "inferentials", prefix = TRUE, link = TRUE, type="Table")`: Inferential Techniques
 ```{r inferentials, echo = F, message = FALSE, warning=FALSE}
-kable(inferential[,1:7]) %>%  add_header_above(c(" ", " ", "Research Question" = 4, " ")) %>%
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
+knitr::kable(inferential[,1:7]) %>%  kableExtra::add_header_above(c(" ", " ", "Research Question" = 4, " ")) %>%
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
 ```
 
 
@@ -195,16 +215,16 @@ The rest of this section begins with a univariate analysis of the categorical an
 For categorical variables, response rates, category frequencies, and proportions, differences in proportions and effect sizes are reported. Descriptive statistics are presented for the two quantitative variables: doctor visits, and sick days.
 
 ### Categorical Variables
-Average valid response rate, as indicated in `r figr("categorical", TRUE, type="Table")`, was `r round(sum(univariate$categorical$Valid) / sum(univariate$categorical$Responses) * 100, 0)`%, for all variables.
+Average valid response rate, as indicated in `r kfigr::figr(label = "categorical", prefix = TRUE, link = TRUE, type="Table")`, was `r round(sum(univariate$categorical$Valid) / sum(univariate$categorical$Responses) * 100, 0)`%, for all variables.
 
-`r figr("categorical", TRUE, type="Table")`: Summary of Univariate Analysis: Categorical Variables
+`r kfigr::figr(label = "categorical", prefix = TRUE, link = TRUE, type="Table")`: Summary of Univariate Analysis: Categorical Variables
 ```{r categorical, include=T, echo = F, results='html'}
-kable(univariate$categorical, digits = 2) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = T, position = "center")
+knitr::kable(univariate$categorical, digits = 2) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = T, position = "center")
 ``` 
 
 #### Depression Variable
-Of the `r univariate$depression$summary[1,4]` responses, `r univariate$depression$summary[1,5]` were valid yielding a response rate of approximately `r round(univariate$depression$summary[1,7],0)`%.  As indicated in `r figr("analyzeDepressionPlot", TRUE, type="Figure")`, the prevalence of diagnoses of depression was `r round(univariate$depression$table[1,3]$Pct, 1)`%.
+Of the `r univariate$depression$summary[1,4]` responses, `r univariate$depression$summary[1,5]` were valid yielding a response rate of approximately `r round(univariate$depression$summary[1,7],0)`%.  As indicated in `r kfigr::figr(label = "analyzeDepressionPlot", prefix = TRUE, link = TRUE, type="Figure")`, the prevalence of diagnoses of depression was `r round(univariate$depression$table[1,3]$Pct, 1)`%.
 
 <div class = 'col2'>
 ```{r analyzeDepressionPlot, include=T, echo = F, results='html'}
@@ -213,10 +233,11 @@ univariate$depression$plot
 
 
 ```{r analyzeDepressionTbl, include=T, echo = F, results='html'}
-kable(univariate$depression$table, digits = 1) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
+knitr::kable(univariate$depression$table, digits = 1) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
 ``` 
 </div>
+`r kfigr::figr(label = "analyzeDepressionPlot", prefix = TRUE, link = TRUE, type="Figure")`: Frequency distribution of diagnoses of depression
 
 An estimated $p =$ 18.2 percent of the American population suffers from depression [@Bekiempis2014a]. A one-proportion z-test was conducted, with a significance level of $\alpha$ = .05, to estimate the difference between the hypothesized proportion, $p$, and the observed proportion, $\hat{p}$ = `r round(univariate$depression$table[1,3]$Pct, 1)` under the following hypotheses:
 
@@ -226,7 +247,7 @@ $H_a$ $p \neq \hat{p}$
 The difference in proportions, `r round(univariate$depression$table[1,3]$Pct - 18.2, 2)`, was statistically significant ($z$ = `r round(univariate$depression$zTest$statistic, 0)`, $p < .001$, two-tailed) with a 95% CI[`r round(univariate$depression$zTest$conf.int[1], 3)`, `r round(univariate$depression$zTest$conf.int[2], 3)`] for the difference in proportions. The effect in terms of relative risk was `r round(univariate$depression$table[1,3]$Pct / 18.2, 2)`.  The prevalence of depression in the sample was greater than that of the population.
 
 #### Chronic Illness Variable
-The 'Chronic' variable, as characterized in `r figr("analyzeChronicPlot", TRUE, type="Figure")`, was derived from the ten categorical dichotomous variables with a collective response rate of `r round(univariate$chronic$summary[1,7], 0)`%. The percent of respondents reporting a diagnosis of one or more chronic conditions was `r univariate$chronic$table[1,3]$Pct`%.
+The 'Chronic' variable, as characterized in `r kfigr::figr(label = "analyzeChronicPlot", prefix = TRUE, link = TRUE, type="Figure")`, was derived from the ten categorical dichotomous variables with a collective response rate of `r round(univariate$chronic$summary[1,7], 0)`%. The percent of respondents reporting a diagnosis of one or more chronic conditions was `r univariate$chronic$table[1,3]$Pct`%.
 
 <div class = 'col2'>
 ```{r analyzeChronicPlot, include=T, echo = F, results='html'}
@@ -234,12 +255,12 @@ univariate$chronic$plot
 ``` 
 
 ```{r analyzeChronicTbl, include=T, echo = F, results='html'}
-kable(univariate$chronic$table, digits = 1) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
+knitr::kable(univariate$chronic$table, digits = 1) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
 ``` 
 
 </div>
-`r figr("analyzeChronicPlot", TRUE, type="Figure")`: Frequency distribution of diagnoses of chronic illness
+`r kfigr::figr(label = "analyzeChronicPlot", prefix = TRUE, link = TRUE, type="Figure")`: Frequency distribution of diagnoses of chronic illness
 
 An estimated $p =$ 60 percent of the American population suffers from one ore more chronic illnesses [@Buttorff2017]. A one-proportion z-test was conducted, with a significance level of $\alpha$ = .05, to estimate the difference between the hypothesized proportion, $p$, and the observed proportion, $\hat{p}$ = `r round(univariate$chronic$table[1,3]$Pct, 1)` under the following hypotheses:
 
@@ -249,7 +270,7 @@ $H_a$ $p \neq \hat{p}$
 The difference in proportions, `r round(univariate$chronic$table[1,3]$Pct - 18.2, 2)`, was statistically significant ($z$ = `r round(univariate$chronic$zTest$statistic, 0)`, $p < .001$, two-tailed) with a 95% CI[`r round(univariate$chronic$zTest$conf.int[1], 3)`, `r round(univariate$chronic$zTest$conf.int[2], 3)`] for the difference in proportions. The effect regarding relative risk was `r round(univariate$chronic$table[1,3]$Pct / 60, 2)`.  The prevalence of chronic illness in the sample was lower than the hypothesized population proportion.
 
 #### Income Variable
-The 'Income' variable, a five level ordinal categorical variable, had a response rate of `r round(univariate$income$summary[1,7], 0)`%, leaving a total sample size of `r univariate$income$summary[1,5]`. The frequency distribution is summarized in `r figr("analyzeIncomePlot", TRUE, type="Figure")`.
+The 'Income' variable, a five level ordinal categorical variable, had a response rate of `r round(univariate$income$summary[1,7], 0)`%, leaving a total sample size of `r univariate$income$summary[1,5]`. The frequency distribution is summarized in `r kfigr::figr(label =  "analyzeIncomePlot", prefix = TRUE, link = TRUE,  type="Figure")`.
 
 <div class = 'col2'>
 ```{r analyzeIncomePlot, include=T, echo = F, results='html', fig.height = 8}
@@ -257,15 +278,15 @@ univariate$income$plot
 ``` 
 
 ```{r analyzeIncomeTbl, include=T, echo = F, results='html', fig.height=8}
-kable(univariate$income$table, digits = 1) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
+knitr::kable(univariate$income$table, digits = 1) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
 ``` 
 
 </div>
-`r figr("analyzeIncomePlot", TRUE, type="Figure")`: Frequency distribution of income levels
+`r kfigr::figr(label = "analyzeIncomePlot", prefix = TRUE, link = TRUE, type="Figure")`: Frequency distribution of income levels
 
 #### Education Variable
-The 'Education' variable, a four level ordinal categorical variable, had a response rate of approximately `r round(univariate$education$summary[1,7], 0)`%, leaving a total sample size of `r univariate$education$summary[1,5]`. The frequency distribution is summarized in `r figr("analyzeEducationPlot", TRUE, type="Figure")`.
+The 'Education' variable, a four level ordinal categorical variable, had a response rate of approximately `r round(univariate$education$summary[1,7], 0)`%, leaving a total sample size of `r univariate$education$summary[1,5]`. The frequency distribution is summarized in `r kfigr::figr(label = "analyzeEducationPlot", prefix = TRUE, link = TRUE, type="Figure")`.
 
 <div class = 'col2'>
 ```{r analyzeEducationPlot, include=T, echo = F, results='html', fig.height=10}
@@ -273,54 +294,55 @@ univariate$education$plot
 ``` 
 
 ```{r analyzeEducationTbl, include=T, echo = F, results='html', fig.height=10}
-kable(univariate$education$table, digits = 1) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
+knitr::kable(univariate$education$table, digits = 1) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
 ``` 
 </div>
-`r figr("analyzeEducationPlot", TRUE, type="Figure")`: Frequency distribution of education level completed
+`r kfigr::figr(label = "analyzeEducationPlot", prefix = TRUE, link = TRUE, type="Figure")`: Frequency distribution of education level completed
 
 
 ### Quantitative Variables
 The descriptive statistics, distributions, outliers, spread, central tendencies, skew and kurtosis of the sick days and Dr. visits variables are summarized below.
 
 #### Sick Days Variable
-As shown in `r figr("sickDaysStats", TRUE, type="Table")`, the SickDays variable had a response rate of `r round(as.numeric(univariate$sickDays$stats1[1,5]), 1)`%, reducing the available sample size to `r univariate$sickDays$stats1[1,4]` observations. Significant right skew, signaled by the difference between the mean and median, and confirmed by the skew and kurtosis measurements, was extant.  
+As shown in `r kfigr::figr("label = sickDaysStats", prefix= TRUE, link = TRUE, type="Table")`, the SickDays variable had a response rate of `r round(as.numeric(univariate$sickDays$stats1[1,5]), 1)`%, reducing the available sample size to `r univariate$sickDays$stats1[1,4]` observations. Significant right skew, signaled by the difference between the mean and median, and confirmed by the skew and kurtosis measurements, was extant.  
 
-`r figr("sickDaysStats", TRUE, type="Table")`: Descriptive Statistics for Sick Days Variable
+`r kfigr::figr("label = sickDaysStats", prefix= TRUE, link = TRUE, type="Table")`: Descriptive Statistics for Sick Days Variable
 ```{r sickDaysStats, include=T, echo = F, results='html'}
-kable(univariate$sickDays$stats1, digits = c(0,0,0,0,1,0,0,0,2,0,3,0,0,2,3,2,2), format = 'html')
+knitr::kable(univariate$sickDays$stats1, digits = c(0,0,0,0,1,0,0,0,2,0,3,0,0,2,3,2,2)) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
 ``` 
 
-The distribution of sick days, characterized in `r figr("sickDaysHist1", TRUE, type="Figure")`, included `r length(brfss$SickDays[brfss$SickDays == 0 & !is.na(brfss$SickDays)])` respondents (`r round(length(brfss$SickDays[brfss$SickDays == 0 & !is.na(brfss$SickDays)]) / univariate$sickDays$stats1[1,4] * 100, 1)`%) who reported zero sick days. To better reveal the distribution, reports of zero sick days were removed, and the new distribution is rendered in `r figr("sickDaysHist2", TRUE, type="Figure")`.
+The distribution of sick days, characterized in `r kfigr::figr(label = "sickDaysHist1", prefix = TRUE, link = TRUE, type="Figure")`, included `r length(brfss$SickDays[brfss$SickDays == 0 & !is.na(brfss$SickDays)])` respondents (`r round(length(brfss$SickDays[brfss$SickDays == 0 & !is.na(brfss$SickDays)]) / univariate$sickDays$stats1[1,4] * 100, 1)`%) who reported zero sick days. To better reveal the distribution, reports of zero sick days were removed, and the new distribution is rendered in `r kfigr::figr(label = "sickDaysHist2", prefix = TRUE, link = TRUE, type="Figure")`.
 
 ```{r sickDaysHist1, include=T, echo = F, results='html'}
 univariate$sickDays$hist1
 ``` 
-`r figr("sickDaysHist1", TRUE, type="Figure")`: Histogram of sick days reported during the previous 30 days
+`r kfigr::figr(label = "sickDaysHist1", prefix = TRUE, link = TRUE, type="Figure")`: Histogram of sick days reported during the previous 30 days
 
-As shown in `r figr("sickDaysHist2", TRUE, type="Figure")`, the average number of sick days, among those reporting one or more sick days, was `r round(as.numeric(univariate$sickDays$stats2[1,9]), 1)`, with a median of `r univariate$sickDays$stats2[1,8]` sick days. The plurality was `r univariate$sickDays$stats2[1,10]` sick days.
+As shown in `r kfigr::figr("sickDaysHist2", prefix = TRUE, link = TRUE, type="Figure")`, the average number of sick days, among those reporting one or more sick days, was `r round(as.numeric(univariate$sickDays$stats2[1,9]), 1)`, with a median of `r univariate$sickDays$stats2[1,8]` sick days. The plurality was `r univariate$sickDays$stats2[1,10]` sick days.
 
 ```{r sickDaysHist2, include=T, echo = F, results='html'}
 univariate$sickDays$hist2
 ``` 
-`r figr("sickDaysHist2", TRUE, type="Figure")`: Histogram of one or more sick days during the previous 30 days
+`r kfigr::figr(label = "sickDaysHist2", prefix = TRUE, link = TRUE, type="Figure")`: Histogram of one or more sick days during the previous 30 days
 
 
 #### Visits Variable
-The Visits variable, as shown in `r figr("visitsStats", TRUE, type="Table")`, had a slightly higher response rate of `r round(univariate$visits$stats[1,5], 0)`%, reducing the available sample size to `r round(univariate$visits$stats[1,4], 0)` observations. The distribution, $Med$ = `r univariate$visits$stats[1,8]`, $\bar{x}$ = `r univariate$visits$stats[1,9]`, $SD$ = `r univariate$visits$stats[1,14]`, was also significantly right-skewed.
+The Visits variable, as shown in `r kfigr::figr(label = "visitsStats", prefix = TRUE, link = TRUE, type="Table")`, had a slightly higher response rate of `r round(univariate$visits$stats[1,5], 0)`%, reducing the available sample size to `r round(univariate$visits$stats[1,4], 0)` observations. The distribution, $Med$ = `r univariate$visits$stats[1,8]`, $\bar{x}$ = `r univariate$visits$stats[1,9]`, $SD$ = `r univariate$visits$stats[1,14]`, was also significantly right-skewed.
 
-`r figr("visitsStats", TRUE, type="Table")`: Descriptive Statistics for Dr. Visits Variable
+`r kfigr::figr(label = "visitsStats", prefix = TRUE, link = TRUE, type="Table")`: Descriptive Statistics for Dr. Visits Variable
 ```{r visitsStats, include=T, echo = F, results='html'}
-kable(univariate$visits$stats, digits = c(0,0,0,0,0,0,0,0,2,0,3,0,0,2,3,2,2)) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
+knitr::kable(univariate$visits$stats, digits = c(0,0,0,0,0,0,0,0,2,0,3,0,0,2,3,2,2)) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
 ``` 
 
-As presented in `r figr("visitsHist", TRUE, type="Figure")`, `r length(brfss$Visits[brfss$Visits == 0 & !is.na(brfss$Visits)])` respondents (`r round(length(brfss$Visits[brfss$Visits == 0 & !is.na(brfss$Visits)]) / univariate$visits$stats[1,4] * 100, 1)`% of valid responses) reported zero Dr. visits during the year preceding the survey.
+As presented in `r kfigr::figr(label = "visitsHist", prefix = TRUE, link = TRUE, type="Figure")`, `r length(brfss$Visits[brfss$Visits == 0 & !is.na(brfss$Visits)])` respondents (`r round(length(brfss$Visits[brfss$Visits == 0 & !is.na(brfss$Visits)]) / univariate$visits$stats[1,4] * 100, 1)`% of valid responses) reported zero Dr. visits during the year preceding the survey.
 
 ```{r visitsHist, include=T, echo = F, results='html'}
 univariate$visits$hist
 ``` 
-`r figr("visitsHist", TRUE, type="Figure")`: Histogram of the number of Dr. visits during previous 12 months
+`r kfigr::figr(label = "visitsHist", prefix = TRUE, link = TRUE, type="Figure")`: Histogram of the number of Dr. visits during previous 12 months
 
 ## Research Question 1: Depression Sociodemographics
 Is there an association between education and income and the prevalence of depression? The analysis below shows that diagnoses of depression were negatively correlated with income. The relationship between depression and scholastic achievement was more knotty than that between depression and financial compensation. The minimum and maximum rates of depression matched with the highest and slightest levels of academic attainment; however, high school graduates suffered in greater proportion than those who attended but did not complete college or a technical school.
@@ -328,43 +350,43 @@ Is there an association between education and income and the prevalence of depre
 ### Depression and Income (Marginal Association)
 This analysis found that depression was inversely associated with income, $X^2$ = `r rq1$tests$incomeInd$statistic`, $N$ = `r rq1$tables$incomeFreq[6,3]`, $df$ = `r rq1$tests$incomeInd$parameter`, $p < .001$ and a strength of `r round(rq1$tests$incomeIndV$cramer, 3)`.
 
-The combined response rate of the Depression and Income variables was `r round(rq1$tables$incomeFreq[6,3] / nrow(brfss) * 100, 1)`%, yielding `r rq1$tables$incomeFreq[6,3]` completed cases for analysis. `r figr("rq1IncomeFreqTable", TRUE, type="Table")` and `r figr("rq1IncomePropTable", TRUE, type="Table")` show the frequencies and proportions, respectively, of depression diagnoses for each income level.
+The combined response rate of the Depression and Income variables was `r round(rq1$tables$incomeFreq[6,3] / nrow(brfss) * 100, 1)`%, yielding `r rq1$tables$incomeFreq[6,3]` completed cases for analysis. `r kfigr::figr(label = "rq1IncomeFreqTable", prefix = TRUE, link = TRUE, type="Table")` and `r kfigr::figr(label = "rq1IncomePropTable", prefix = TRUE, link = TRUE, type="Table")` show the frequencies and proportions, respectively, of depression diagnoses for each income level.
 
 <center>
-`r figr("rq1IncomeFreqTable", TRUE, type="Table")`: Marginal contingency table of frequencies of depression diagnoses by income level
+`r kfigr::figr(label = "rq1IncomeFreqTable", prefix = TRUE, link = TRUE, type="Table")`: Marginal contingency table of frequencies of depression diagnoses by income level
 ```{r rq1IncomeFreqTable, include=T, echo = F, results='asis'}
-stargazer(format(rq1$tables$incomeFreq, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+stargazer::stargazer(format(rq1$tables$incomeFreq, quote = FALSE, justify = "right", big.mark = ","))
 ``` 
 </center>
 
 <center>
-`r figr("rq1IncomePropTable", TRUE, type="Table")`: Marginal contingency table of proportions of depression diagnoses by income level
+`r kfigr::figr(label = "rq1IncomePropTable", prefix = TRUE, link = TRUE, type="Table")`: Marginal contingency table of proportions of depression diagnoses by income level
 ```{r rq1IncomePropTable, include=T, echo = F, results='asis'}
-stargazer(format(rq1$tables$incomeProp, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+stargazer::stargazer(format(rq1$tables$incomeProp, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
 ``` 
 </center>
 
-Of those respondents who reported income, `r rq1$tables$incomeFreq[6,1]` (`r round(rq1$tables$incomeFreq[6,1] / rq1$tables$incomeFreq[6,3] * 100, 2)`%) indicated a prior diagnosis of depression. Stated in `r figr("rq1IncomePropTable", TRUE, type="Table")` and further clarified in `r figr("rq1IncomePlots", TRUE, type="Figure")`, rates of depression were inversely associated with income. 
+Of those respondents who reported income, `r rq1$tables$incomeFreq[6,1]` (`r round(rq1$tables$incomeFreq[6,1] / rq1$tables$incomeFreq[6,3] * 100, 2)`%) indicated a prior diagnosis of depression. Stated in `r kfigr::figr(label = "rq1IncomePropTable", prefix = TRUE, link = TRUE, type = "Table")` and further clarified in `r kfigr::figr("rq1IncomePlots", prefix = TRUE,  link = TRUE, type = "Figure")`, rates of depression were inversely associated with income. 
 
 ```{r rq1IncomePlots, include=T, echo = F, results='html'}
-grid.arrange(rq1$plots$incomeFreq, rq1$plots$incomeProp, ncol = 2)
+gridExtra::grid.arrange(rq1$plots$incomeFreq, rq1$plots$incomeProp, ncol = 2)
 ``` 
-`r figr("rq1IncomePlots", TRUE, type="Figure")`: Marginal frequencies and proportions of depression diagnoses by income level
+`r kfigr::figr("rq1IncomePlots", prefix = TRUE,  link = TRUE, type = "Figure")`: Marginal frequencies and proportions of depression diagnoses by income level
 
 The mosaic plot below graphically depicts the association between depression diagnoses and financial compensation levels, vis-a-vis the independence model. 
 ```{r rq1IncomeMosaic, include=T, fig.height=10, fig.width=14, echo = F, results='html'}
-  mosaic(rq1$tables$incomeTable, shade = TRUE, legend = TRUE,
-         labeling= labeling_border(rot_labels = c(0,0,0,0), 
+  vcd::mosaic(rq1$tables$incomeTable, shade = TRUE, legend = TRUE,
+         labeling= vcd::labeling_border(rot_labels = c(0,0,0,0), 
                                    varnames = c(FALSE, TRUE),
-                                   gp_labels = gpar(fontsize = 10),
+                                   gp_labels = grid::gpar(fontsize = 10),
                                    just_labels = c("left", 
                                                    "center", 
                                                    "center", 
                                                    "right")))
 ``` 
-`r figr("rq1IncomeMosaic", TRUE, type="Figure")`: Mosaic plot of marginal relationship between depression and income
+`r kfigr::figr("rq1IncomeMosaic", prefix = TRUE,  link = TRUE, type = "Figure")`: Mosaic plot of marginal relationship between depression and income
 
-In `r figr("rq1IncomeMosaic", TRUE, type="Figure")`, the width of the bars indicates the relative proportion of respondents at each  income level that either had or had not a diagnosis of depression. For instance, the "50,000 or more" income level had the smallest proportion of respondents with a diagnosis of depression. The height of the bars connotes the percentage of the overall responses by salary level.  The colors express residuals from the Pearson chi-square model of independence.  Blue implies that observed frequencies were greater than expected for independence.  Red suggests fewer observations than expected. Grey denotes that observed and expected frequencies were approximately equal.  To sum, the observed frequencies of depression diagnoses for the two lowest income categories were greater than expected assuming independence. The two highest income levels had too few.  The 25,000 to 35,000 income level frequencies were approximately equal to expected.
+In `r kfigr::figr("rq1IncomeMosaic", prefix = TRUE,  link = TRUE, type = "Figure")`, the width of the bars indicates the relative proportion of respondents at each  income level that either had or had not a diagnosis of depression. For instance, the "50,000 or more" income level had the smallest proportion of respondents with a diagnosis of depression. The height of the bars connotes the percentage of the overall responses by salary level.  The colors express residuals from the Pearson chi-square model of independence.  Blue implies that observed frequencies were greater than expected for independence.  Red suggests fewer observations than expected. Grey denotes that observed and expected frequencies were approximately equal.  To sum, the observed frequencies of depression diagnoses for the two lowest income categories were greater than expected assuming independence. The two highest income levels had too few.  The 25,000 to 35,000 income level frequencies were approximately equal to expected.
 
 The differences in proportions were tested for statistical significance with a chi-squared at a significance level of $\alpha$ = .05, under the following hypotheses:
 
@@ -373,12 +395,12 @@ $H_a$: Diagnoses of depression and income level are not independent
 
 The differences in proportions were statistically significant, $X^2$ = `r rq1$tests$incomeInd$statistic`, $N$ = `r rq1$tables$incomeFreq[6,3]`, $df$ = `r rq1$tests$incomeInd$parameter`, and $p < .001$. The strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$incomeIndV$cramer, 3)`. Nonetheless, the null hypothesis was rejected in favor of the alternative hypothesis of the association between depression and income.
 
-Lastly, `r figr("rq1IncomeOdds", TRUE, type="Figure")` presents the odds ratios at each income level.  
+Lastly, `r kfigr::figr("rq1IncomeOdds", prefix = TRUE,  link = TRUE, type = "Figure")` presents the odds ratios at each income level.  
 
-`r figr("rq1IncomeOdds", TRUE, type="Table")`: The marginal odds ratios of a diagnosis of depression by income level 
+`r kfigr::figr("rq1IncomeOdds", prefix = TRUE,  link = TRUE, type = "Table")`: The marginal odds ratios of a diagnosis of depression by income level 
 ```{r rq1IncomeOdds, include=T, echo = F, results='html'}
-kable(rq1$analysis$incomeOdds, digits = 2) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = T, position = "center")
+knitr::kable(rq1$analysis$incomeOdds, digits = 2) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = T, position = "center")
 ``` 
 
 The odds of a diagnosis of depression decreased with increasing income until the highest level was reached at which point, the odds increased.  
@@ -388,45 +410,45 @@ In conclusion, this analysis has shown that rates of depression were inversely c
 ### Depression and Education (Marginal Association)
 This analysis revealed a significant marginal association between education and diagnoses of depression $X^2$ = `r rq1$tests$educationInd$statistic`, $N$ = `r rq1$tables$educationFreq[5,3]`, $df$ = `r rq1$tests$educationInd$parameter`, and $p < .001$. The strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$educationIndV$cramer, 3)`.
 
-The combined response rate of the Depression and Education variables was `r round(rq1$tables$educationFreq[5,3] / nrow(brfss) * 100, 2)`%, yielding `r rq1$tables$educationFreq[5,3]` completed cases for analysis. `r figr("rq1EducationFreqTable", TRUE, type="Table")` and `r figr("rq1EducationPropTable", TRUE, type="Table")` show the frequencies and proportions of depression diagnoses for each education category.
+The combined response rate of the Depression and Education variables was `r round(rq1$tables$educationFreq[5,3] / nrow(brfss) * 100, 2)`%, yielding `r rq1$tables$educationFreq[5,3]` completed cases for analysis. `r kfigr::figr("rq1EducationFreqTable", prefix = TRUE,  link = TRUE, type = "Table")` and `r kfigr::figr("rq1EducationPropTable", prefix = TRUE,  link = TRUE, type = "Table")` show the frequencies and proportions of depression diagnoses for each education category.
 
 <center>
-`r figr("rq1EducationFreqTable", TRUE, type="Table")`: Marginal contingency table of frequencies of depression diagnoses by education level
+`r kfigr::figr("rq1EducationFreqTable", prefix = TRUE,  link = TRUE, type = "Table")`: Marginal contingency table of frequencies of depression diagnoses by education level
 ```{r rq1EducationFreqTable, include=T, echo = F, results='asis'}
-stargazer(format(rq1$tables$educationFreq, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+stargazer::stargazer(format(rq1$tables$educationFreq, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
 ``` 
 </center>
 
 <center>
-`r figr("rq1EducationPropTable", TRUE, type="Table")`: Marginal contingency table of proportions of depression diagnoses by education level
+`r kfigr::figr("rq1EducationPropTable", prefix = TRUE,  link = TRUE, type = "Table")`: Marginal contingency table of proportions of depression diagnoses by education level
 ```{r rq1EducationPropTable, include=T, echo = F, results='asis'}
-stargazer(format(rq1$tables$educationProp, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+stargazer::stargazer(format(rq1$tables$educationProp, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
 ``` 
 </center>
 
 Of those respondents who reported education, `r rq1$tables$educationFreq[5,1]` (`r round(rq1$tables$educationFreq[5,1] / rq1$tables$educationFreq[5,3] * 100, 2)`%) indicated a prior diagnosis of depression. 
 
-The following bar charts provide graphical representations of the marginal frequencies and proportions of depression diagnoses by education category. `r figr("rq1EducationPlots", TRUE, type="Figure")` shows that the lowest and highest rates of depression were associated the highest and lowest levels of education; and, those that attended, but did not complete college or a trade school had diagnoses of depression at a slightly higher rate than those who had only completed high school.
+The following bar charts provide graphical representations of the marginal frequencies and proportions of depression diagnoses by education category. `r kfigr::figr("rq1EducationPlots", prefix = TRUE,  link = TRUE, type = "Figure")` shows that the lowest and highest rates of depression were associated the highest and lowest levels of education; and, those that attended, but did not complete college or a trade school had diagnoses of depression at a slightly higher rate than those who had only completed high school.
 
 ```{r rq1EducationPlots, include=T, echo = F, results='html'}
-grid.arrange(rq1$plots$educationFreq, rq1$plots$educationProp, ncol = 2, top = "Distribution of Diagnoses of Depression")
+gridExtra::grid.arrange(rq1$plots$educationFreq, rq1$plots$educationProp, ncol = 2, top = "Distribution of Diagnoses of Depression")
 ``` 
-`r figr("rq1EducationPlots", TRUE, type="Figure")`: Marginal frequencies and proportions of depression diagnoses by education level completed
+`r kfigr::figr("rq1EducationPlots", prefix = TRUE,  link = TRUE, type = "Figure")`: Marginal frequencies and proportions of depression diagnoses by education level completed
 
 The mosaic plot below graphically depicts the association between depression diagnoses and education levels, vis-a-vis the independence model. 
 ```{r rq1EducationMosaic, include=T, fig.height=10, fig.width=14, echo = F, results='html'}
-  mosaic(rq1$tables$educationTable, shade = TRUE, legend = TRUE,
-         labeling= labeling_border(rot_labels = c(0,0,0,0), 
+  vcd::mosaic(rq1$tables$educationTable, shade = TRUE, legend = TRUE,
+         labeling= vcd::labeling_border(rot_labels = c(0,0,0,0), 
                                    varnames = c(FALSE, TRUE),
-                                   gp_labels = gpar(fontsize = 15),
+                                   gp_labels = grid::gpar(fontsize = 15),
                                    just_labels = c("left", 
                                                    "center", 
                                                    "center", 
                                                    "right")))
 ``` 
-`r figr("rq1EducationMosaic", TRUE, type="Figure")`: Mosaic plot of marginal relationship between depression and education
+`r kfigr::figr("rq1EducationMosaic", prefix = TRUE,  link = TRUE, type = "Figure")`: Mosaic plot of marginal relationship between depression and education
 
-As shown in `r figr("rq1EducationMosaic", TRUE, type="Figure")`,  the numbers of observed diagnoses of depression among those that did not graduate from high school, and those that attended college or technical school were greater than expected under the independence model.  Observed and expected frequencies of depression diagnoses among high-school graduates were approximately equal.  Finally, observed frequencies of diagnoses of depression among college graduates were lower than expected under independence model.
+As shown in `r kfigr::figr("rq1EducationMosaic", prefix = TRUE,  link = TRUE, type = "Figure")`,  the numbers of observed diagnoses of depression among those that did not graduate from high school, and those that attended college or technical school were greater than expected under the independence model.  Observed and expected frequencies of depression diagnoses among high-school graduates were approximately equal.  Finally, observed frequencies of diagnoses of depression among college graduates were lower than expected under independence model.
 
 The differences in proportions were tested for statistical significance with a chi-squared at a significance level of $\alpha$ = .05, under the following hypotheses:
 
@@ -435,44 +457,44 @@ $H_a$: Diagnoses of depression and education level are not independent
 
 The differences in proportions were statistically significant, $X^2$ = `r rq1$tests$educationInd$statistic`, $N$ = `r rq1$tables$educationFreq[5,3]`, $df$ = `r rq1$tests$educationInd$parameter`, and $p$ < .001. The strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$educationIndV$cramer, 3)`.
 
-Lastly, `r figr("rq1EducationOdds", TRUE, type="Figure")` presents the odds of a depression diagnosis at each level of education.
+Lastly, `r kfigr::figr("rq1EducationOdds", prefix = TRUE,  link = TRUE, type = "Figure")` presents the odds of a depression diagnosis at each level of education.
 
-`r figr("rq1EducationOdds", TRUE, type="Table")`: The marginal odds ratios of a diagnosis of depression by education level 
+`r kfigr::figr("rq1EducationOdds", prefix = TRUE,  link = TRUE, type = "Table")`: The marginal odds ratios of a diagnosis of depression by education level 
 ```{r rq1EducationOdds, include=T, echo = F, results='html'}
-kable(rq1$analysis$educationOdds, digits = 2) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = T, position = "center")
+knitr::kable(rq1$analysis$educationOdds, digits = 2) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = T, position = "center")
 ``` 
 The odds of a diagnoses of depression were substantially greater among those that did not graduate high school vis-a-vis high school graduates.  Odds decreased for those that attended some college or technical school, then increased substantially for college graduates.
 
 Summing up, this analysis has revealed an association between income and diagnoses of depression with a significance of $X^2$ = `r rq1$tests$educationInd$statistic`, $N$ = `r rq1$tables$educationFreq[5,3]`, $df$ = `r rq1$tests$educationInd$parameter`, and $p$ < .001. The strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$educationIndV$cramer, 3)`. Lower rates of depression were associated with high school and college graduates. The highest rates of depression were among those that did not graduate from high-school and those that attended some college or technical school, but did not graduate. 
 
 ### Depression by Income, Control by Education (Conditional Association)
-The conditional association of income and depression, controlling for education was significant at each level of education. In other words, rates of depression and income were inversely associated, regardless of education level, as `r figr("rq1InteractionPlots", TRUE, type="Figure")` presents.
+The conditional association of income and depression, controlling for education was significant at each level of education. In other words, rates of depression and income were inversely associated, regardless of education level, as `r kfigr::figr("rq1InteractionPlots", prefix = TRUE,  link = TRUE, type = "Figure")` presents.
 
 ```{r rq1InteractionPlots, include=T, echo = F, fig.height=10, results='html'}
-grid.arrange(rq1$plots$conditionalProp[[1]], rq1$plots$conditionalProp[[2]],
+gridExtra::grid.arrange(rq1$plots$conditionalProp[[1]], rq1$plots$conditionalProp[[2]],
              rq1$plots$conditionalProp[[3]], rq1$plots$conditionalProp[[4]], ncol = 2, top = "Proportional Distribution of Depression by Income and Education")
 ``` 
-`r figr("rq1InteractionPlots", TRUE, type="Figure")`: Conditional proportions of depression diagnoses by income, controlling for education
+`r kfigr::figr("rq1InteractionPlots", prefix = TRUE,  link = TRUE, type = "Figure")`: Conditional proportions of depression diagnoses by income, controlling for education
 
-The mosaic plot in `r figr("rq1ConditionalMosaic", TRUE, type="Figure")` graphically depicts the association between depression diagnoses and income levels, controlling for education, vis-a-vis the independence model. 
+The mosaic plot in `r kfigr::figr("rq1ConditionalMosaic", prefix = TRUE,  link = TRUE, type = "Figure")` graphically depicts the association between depression diagnoses and income levels, controlling for education, vis-a-vis the independence model. 
 ```{r rq1ConditionalMosaic, include=T, fig.height=6, fig.width=10, echo = F, results='html'}
 lnames <- list(Income = c("< 15k", "< 25k", "< 35k", "< 50k", "50k +"),
                Education = c("Did not graduate high school", "Graduated high school",
                              "Some College", "Graduated College"))
-  mosaic(rq1$tables$freq, shade = TRUE, legend = TRUE,
-         labeling= labeling_border(rot_labels = c(0,0,0,0), 
+  vcd::mosaic(rq1$tables$freq, shade = TRUE, legend = TRUE,
+         labeling= vcd::labeling_border(rot_labels = c(0,0,0,0), 
                                    varnames = c(FALSE, TRUE),
-                                   gp_labels = gpar(fontsize = 10),
+                                   gp_labels = grid::gpar(fontsize = 10),
                                    just_labels = c("left", 
                                                    "center", 
                                                    "center", 
                                                    "right"),
                                    set_labels = lnames))
 ``` 
-`r figr("rq1ConditionalMosaic", TRUE, type="Figure")`: Mosaic plot of marginal relationship between depression and income
+`r kfigr::figr("rq1ConditionalMosaic", prefix = TRUE,  link = TRUE, type = "Figure")`: Mosaic plot of marginal relationship between depression and income
 
-The plot of Pearson residuals in `r figr("rq1ConditionalMosaic", TRUE, type="Figure")` suggests an association between financial compensation and depression at every level of education. The difference in proportions of depression diagnoses among the income categories, controlling for education was tested using the Cochran-Mantel-Haenszel test with a significance level of $\alpha$ = .05, under the following hypotheses:
+The plot of Pearson residuals in `r kfigr::figr("rq1ConditionalMosaic", prefix = TRUE,  link = TRUE, type = "Figure")` suggests an association between financial compensation and depression at every level of education. The difference in proportions of depression diagnoses among the income categories, controlling for education was tested using the Cochran-Mantel-Haenszel test with a significance level of $\alpha$ = .05, under the following hypotheses:
 
 $H_0$: Diagnoses of depression are independent of income at every level education  
 $H_a$: Diagnoses of depression are not independent of income and at every level education
@@ -480,70 +502,70 @@ $H_a$: Diagnoses of depression are not independent of income and at every level 
 The following tables summarize the conditional association of depression and income at each level of education.
 
 <div class = 'col2'>
-`r figr("rq1CMH1", TRUE, type="Table")`: Conditional association of depression and income. Stratum: Did not graduate high school
+`r kfigr::figr("rq1CMH1", prefix = TRUE,  link = TRUE, type = "Table")`: Conditional association of depression and income. Stratum: Did not graduate high school
 ```{r rq1CMH1, include=T, echo = F, results='html'}
-kable(rq1$tests$condInd[[1]]$df, digits = c(0,0,0,0,4), caption = 'Cochran–Mantel–Haenszel for Depression by Income') %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
-  add_header_above(c('Stratum: Did not graduate high school' = 5))
+knitr::kable(rq1$tests$condInd[[1]]$df, digits = c(0,0,0,0,4), caption = 'Cochran–Mantel–Haenszel for Depression by Income') %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  kableExtra::add_header_above(c('Stratum: Did not graduate high school' = 5))
 ``` 
 
-`r figr("rq1CMH2", TRUE, type="Table")`: Conditional association of depression and income. Stratum: Graduated high school
+`r kfigr::figr("rq1CMH2", prefix = TRUE,  link = TRUE, type = "Table")`: Conditional association of depression and income. Stratum: Graduated high school
 ```{r rq1CMH2, include=T, echo = F, results='html'}
-kable(rq1$tests$condInd[[2]]$df, digits = c(0,0,0,0,4), caption = 'Cochran–Mantel–Haenszel for Depression by Income') %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
-  add_header_above(c('Stratum: Graduated high school' = 5))
+knitr::kable(rq1$tests$condInd[[2]]$df, digits = c(0,0,0,0,4), caption = 'Cochran–Mantel–Haenszel for Depression by Income') %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  kableExtra::add_header_above(c('Stratum: Graduated high school' = 5))
 ``` 
 
 </div>
 
 <div class = 'col2'>
-`r figr("rq1CMH3", TRUE, type="Table")`: Conditional association of depression and income. Stratum: Attended college or technical school
+`r kfigr::figr("rq1CMH3", prefix = TRUE,  link = TRUE, type = "Table")`: Conditional association of depression and income. Stratum: Attended college or technical school
 ```{r rq1CMH3, include=T, echo = F, results='html'}
-kable(rq1$tests$condInd[[3]]$df, digits = c(0,0,0,0,4), caption = 'Cochran–Mantel–Haenszel for Depression by Income') %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
-  add_header_above(c('Stratum: Attended college or technical school' = 5))
+knitr::kable(rq1$tests$condInd[[3]]$df, digits = c(0,0,0,0,4), caption = 'Cochran–Mantel–Haenszel for Depression by Income') %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  kableExtra::add_header_above(c('Stratum: Attended college or technical school' = 5))
 ``` 
 
-`r figr("rq1CMH4", TRUE, type="Table")`: Conditional association of depression and income. Stratum: Graduated college or technical school
+`r kfigr::figr("rq1CMH4", prefix = TRUE,  link = TRUE, type = "Table")`: Conditional association of depression and income. Stratum: Graduated college or technical school
 ```{r rq1CMH4, include=T, echo = F, results='html'}
-kable(rq1$tests$condInd[[4]]$df, digits = c(0,0,0,0,4), caption = 'Cochran–Mantel–Haenszel for Depression by Income') %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
-  add_header_above(c('Stratum: Graduated college or technical school' = 5))
+knitr::kable(rq1$tests$condInd[[4]]$df, digits = c(0,0,0,0,4), caption = 'Cochran–Mantel–Haenszel for Depression by Income') %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  kableExtra::add_header_above(c('Stratum: Graduated college or technical school' = 5))
 ``` 
 
 </div>
 
-As indicated in `r figr("rq1CMH1", TRUE, type="Table")`, `r figr("rq1CMH2", TRUE, type="Table")`, `r figr("rq1CMH3", TRUE, type="Table")`, and `r figr("rq1CMH4", TRUE, type="Table")`, the differences in proportions were significant, $p$ < .001, across each education level. To ascertain the strength of the associations, odds ratios were computed. `r figr("rq1ConditionaOdds1", TRUE, type="Table")`, `r figr("rq1ConditionaOdds2", TRUE, type="Table")`, `r figr("rq1ConditionaOdds3", TRUE, type="Table")`. and `r figr("rq1ConditionaOdds4", TRUE, type="Table")` list the conditional odds ratios at each level of education.  
+As indicated in `r kfigr::figr("rq1CMH1", prefix = TRUE,  link = TRUE, type = "Table")`, `r kfigr::figr("rq1CMH2", prefix = TRUE,  link = TRUE, type = "Table")`, `r kfigr::figr("rq1CMH3", prefix = TRUE,  link = TRUE, type = "Table")`, and `r kfigr::figr("rq1CMH4", prefix = TRUE,  link = TRUE, type = "Table")`, the differences in proportions were significant, $p$ < .001, across each education level. To ascertain the strength of the associations, odds ratios were computed. `r kfigr::figr("rq1ConditionaOdds1", prefix = TRUE,  link = TRUE, type = "Table")`, `r kfigr::figr("rq1ConditionaOdds2", prefix = TRUE,  link = TRUE, type = "Table")`, `r kfigr::figr("rq1ConditionaOdds3", prefix = TRUE,  link = TRUE, type = "Table")`. and `r kfigr::figr("rq1ConditionaOdds4", prefix = TRUE,  link = TRUE, type = "Table")` list the conditional odds ratios at each level of education.  
 
 <div class = 'col2'>
-`r figr("rq1ConditionaOdds1", TRUE, type="Table")`: Conditional odds ratios of depression and income. Stratum: Did not graduate high school
-```{r rq1ConditionaOdds1, include=T, echo = F, results='html'}
-kable(rq1$analysis$conditionalOdds[[1]]$df, digits = 2, caption = 'Conditional Odds Ratios for Depression by Income') %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
-  add_header_above(c('Stratum: Did not graduate high school' = 2))
+`r kfigr::figr("rq1ConditionalOdds1", prefix = TRUE,  link = TRUE, type = "Table")`: Conditional odds ratios of depression and income. Stratum: Did not graduate high school
+```{r rq1ConditionalOdds1, include=T, echo = F, results='html'}
+knitr::kable(rq1$analysis$conditionalOdds[[1]]$df, digits = 2, caption = 'Conditional Odds Ratios for Depression by Income') %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  kableExtra::add_header_above(c('Stratum: Did not graduate high school' = 2))
 ``` 
 
-`r figr("rq1ConditionaOdds2", TRUE, type="Table")`: Conditional odds ratios of depression and income. Stratum: Graduated high school
-```{r rq1ConditionaOdds2, include=T, echo = F, results='html'}
-kable(rq1$analysis$conditionalOdds[[2]]$df, digits = 2, caption = 'Conditional Odds Ratios for Depression by Income') %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
-  add_header_above(c('Stratum: Graduated high school' = 2))
+`r kfigr::figr("rq1ConditionalOdds2", prefix = TRUE,  link = TRUE, type = "Table")`: Conditional odds ratios of depression and income. Stratum: Graduated high school
+```{r rq1ConditionalOdds2, include=T, echo = F, results='html'}
+knitr::kable(rq1$analysis$conditionalOdds[[2]]$df, digits = 2, caption = 'Conditional Odds Ratios for Depression by Income') %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  kableExtra::add_header_above(c('Stratum: Graduated high school' = 2))
 ``` 
 </div>
 
 <div class = 'col2'>
-`r figr("rq1ConditionaOdds3", TRUE, type="Table")`: Conditional odds ratios of depression and income. Stratum: Attended college or technical school
-```{r rq1ConditionaOdds3, include=T, echo = F, results='html'}
-kable(rq1$analysis$conditionalOdds[[3]]$df, digits = 2, caption = 'Conditional Odds Ratios for Depression by Income') %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
-  add_header_above(c('Stratum: Attended college or technical school' = 2))
+`r kfigr::figr("rq1ConditionalOdds3", prefix = TRUE,  link = TRUE, type = "Table")`: Conditional odds ratios of depression and income. Stratum: Attended college or technical school
+```{r rq1ConditionalOdds3, include=T, echo = F, results='html'}
+knitr::kable(rq1$analysis$conditionalOdds[[3]]$df, digits = 2, caption = 'Conditional Odds Ratios for Depression by Income') %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  kableExtra::add_header_above(c('Stratum: Attended college or technical school' = 2))
 ``` 
 
-`r figr("rq1ConditionaOdds4", TRUE, type="Table")`: Conditional odds ratios of depression and income. Stratum: Graduated college or technical school
-```{r rq1ConditionaOdds4, include=T, echo = F, results='html'}
-kable(rq1$analysis$conditionalOdds[[4]]$df, digits = 2, caption = 'Conditional Odds Ratios for Depression by Income') %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
-  add_header_above(c('Stratum: Graduated college or technical school' = 2))
+`r kfigr::figr("rq1ConditionalOdds4", prefix = TRUE,  link = TRUE, type = "Table")`: Conditional odds ratios of depression and income. Stratum: Graduated college or technical school
+```{r rq1ConditionalOdds4, include=T, echo = F, results='html'}
+knitr::kable(rq1$analysis$conditionalOdds[[4]]$df, digits = 2, caption = 'Conditional Odds Ratios for Depression by Income') %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  kableExtra::add_header_above(c('Stratum: Graduated college or technical school' = 2))
 ``` 
 </div>
 
@@ -554,19 +576,19 @@ In conclusion, depression was inversely associated with income at every level of
 ### Depression and Income and Education (Joint Association)
 Is there a joint association between income and scholastic achievement and diagnoses of depression? The association is affirmed by this analysis with a statistical significance of $X^2$ ($df$ = `r rq1$tests$jointInd$parameter`, $N$ = `r rq1$tables$interactionFreq[21,3]`) = `r round(rq1$tests$jointInd$statistic, 0)`, $p$ < .001. The overall strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$jointIndV$cramer, 3)`.
 
-The combined response rate of the income, education, and depression variables was `r round(rq1$tables$interactionFreq[21,3] / nrow(brfss) * 100, 1)`%, yielding `r rq1$tables$interactionFreq[21,3]` completed cases for analysis. `r figr("rq1InteractionFreqTable", TRUE, type="Table")` and `r figr("rq1InteractionPropTable", TRUE, type="Table")` show the frequencies and proportions of depression diagnoses by the combination of income and education.
+The combined response rate of the income, education, and depression variables was `r round(rq1$tables$interactionFreq[21,3] / nrow(brfss) * 100, 1)`%, yielding `r rq1$tables$interactionFreq[21,3]` completed cases for analysis. `r kfigr::figr("rq1InteractionFreqTable", prefix = TRUE,  link = TRUE, type = "Table")` and `r kfigr::figr("rq1InteractionPropTable", prefix = TRUE,  link = TRUE, type = "Table")` show the frequencies and proportions of depression diagnoses by the combination of income and education.
 
 <center>
-`r figr("rq1InteractionFreqTable", TRUE, type="Table")`: Contingency table of frequencies of depression diagnoses by income and education levels
+`r kfigr::figr("rq1InteractionFreqTable", prefix = TRUE,  link = TRUE, type = "Table")`: Contingency table of frequencies of depression diagnoses by income and education levels
 ```{r rq1InteractionFreqTable, include=T, echo = F, results='asis'}
-stargazer(format(rq1$tables$jointFreq, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+stargazer::stargazer(format(rq1$tables$jointFreq, quote = FALSE, justify = "right", big.mark = ","))
 ``` 
 </center>
 
 <center>
-`r figr("rq1InteractionPropTable", TRUE, type="Table")`: Contingency table of proportions of depression diagnoses by income and education levels
+`r kfigr::figr("rq1InteractionPropTable", prefix = TRUE,  link = TRUE, type = "Table")`: Contingency table of proportions of depression diagnoses by income and education levels
 ```{r rq1InteractionPropTable, include=T, echo = F, results='asis'}
-stargazer(format(rq1$tables$jointProp, quote = FALSE, justify = "right", big.mark = ",", digits = 3),  type = 'html')
+stargazer::stargazer(format(rq1$tables$jointProp, quote = FALSE, justify = "right", big.mark = ",", digits = 3),  type = 'html')
 ``` 
 </center>
 
@@ -595,20 +617,20 @@ lnames <- list(IncomeEducation = c("No High School (<15k)",
                                    "College Graduage(<35k)",
                                    "College Graduage(<50k)",
                                    "College Graduage(50k+)"))
-  mosaic(rq1$tables$interactionTable, shade = TRUE, legend = TRUE,
-         labeling= labeling_border(rot_labels = c(0,0,0,0), 
+  vcd::mosaic(rq1$tables$interactionTable, shade = TRUE, legend = TRUE,
+         labeling= vcd::labeling_border(rot_labels = c(0,0,0,0), 
                                    varnames = c(FALSE, TRUE),
-                                   gp_labels = gpar(fontsize = 10),
-                                   gp_varnames = gpar(fontsize = 20),
+                                   gp_labels = grid::gpar(fontsize = 10),
+                                   gp_varnames = grid::gpar(fontsize = 20),
                                    just_labels = c("left", 
                                                    "center", 
                                                    "center", 
                                                    "right"),
                                    set_labels = lnames))
 ``` 
-`r figr("rq1InteractionMosaic", TRUE, type="Figure")`: Mosaic plot of joint association between depression and income and education
+`r kfigr::figr("rq1InteractionMosaic", prefix = TRUE,  link = TRUE, type = "Figure")`: Mosaic plot of joint association between depression and income and education
 
-In `r figr("rq1InteractionMosaic", TRUE, type="Figure")`, blue indicates that the observed frequencies were greater than the expected frequencies under the independence mode, red means that the observed frequencies were fewer than the expected frequencies.
+In `r kfigr::figr("rq1InteractionMosaic", prefix = TRUE,  link = TRUE, type = "Figure")`, blue indicates that the observed frequencies were greater than the expected frequencies under the independence mode, red means that the observed frequencies were fewer than the expected frequencies.
 
 The differences in proportions were tested for statistical significance with a chi-squared at a significance level of $\alpha$ = .05, under the following hypotheses:
 
@@ -618,16 +640,16 @@ $H_a$: Income and education are not jointly independent of diagnoses of depressi
 The differences in proportions were statistically significant, $X^2$ (`r rq1$tests$jointInd$parameter`, $N$ = `r rq1$tables$interactionFreq[21,3]`) = `r round(rq1$tests$jointInd$statistic, 0)`, $p$ < .001. The overall strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$jointIndV$cramer, 3)`. Nonetheless, the null hypothesis of joint independence was rejected.
 
 
-Odds ratios were calculated (`r figr("rq1JointOdds", TRUE, type="Table")`) to determine the strength of the association. 
+Odds ratios were calculated (`r kfigr::figr("rq1JointOdds", prefix = TRUE,  link = TRUE, type = "Table")`) to determine the strength of the association. 
 
-`r figr("rq1JointOdds", TRUE, type="Table")`: Joint odds ratios of depression and income and education. 
+`r kfigr::figr("rq1JointOdds", prefix = TRUE,  link = TRUE, type = "Table")`: Joint odds ratios of depression and income and education. 
 ```{r rq1JointOdds, include=T, echo = F, results='html'}
-kable(rq1$analysis$interactionOdds %>% select(Income, Odds), digits = 2) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
-  group_rows("Did not graduate high school/Yes:No",1,5) %>%
-  group_rows("Graduate high school/Yes:No",6,10) %>%
-  group_rows("Attended college or technical school/Yes:No",11,15) %>%
-  group_rows("Graduated college or technical school/Yes:No",16,19)
+knitr::kable(rq1$analysis$interactionOdds %>% select(Income, Odds), digits = 2) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  kableExtra::group_rows("Did not graduate high school/Yes:No",1,5) %>%
+  kableExtra::group_rows("Graduate high school/Yes:No",6,10) %>%
+  kableExtra::group_rows("Attended college or technical school/Yes:No",11,15) %>%
+  kableExtra::group_rows("Graduated college or technical school/Yes:No",16,19)
 ``` 
 
 To wrap up, the data support the presence of marginal, conditional and joint associations between depression diagnosis and income and education. Income was inversely associated with rates of depression $X^2$ = `r rq1$tests$incomeInd$statistic`, $N$ = `r rq1$tables$incomeFreq[6,3]`, $df$ = `r rq1$tests$incomeInd$parameter`, and $p < .001$. The strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$incomeIndV$cramer, 3)`. Rates of depression diagnoses were also marginally associated with education level completed $X^2$ = `r rq1$tests$educationInd$statistic`, $N$ = `r rq1$tables$educationFreq[5,3]`, $df$ = `r rq1$tests$educationInd$parameter`, and $p$ < .001. The strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$educationIndV$cramer, 3)`.Conditional associations between rates of depression and income were extant at each level of education with a significance of $p$ < .001.  Lastly, income and education were found to be jointly associated with depression diagnoses $X^2$ (`r rq1$tests$jointInd$parameter`, $N$ = `r rq1$tables$interactionFreq[21,3]`) = `r round(rq1$tests$jointInd$statistic, 0)`, $p$ < .001. The overall strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$jointIndV$cramer, 3)`.
@@ -635,39 +657,39 @@ To wrap up, the data support the presence of marginal, conditional and joint ass
 ## Research Question #2: Depression and Chronic Disease
 Is there a relationship between depression and chronic illness? According to this analysis, chronic disease was associated with depression with a statistical significance of , $X^2$ (`r rq2$tests$X2$parameter`, $N$ = `r sum(rq2$tables$freq)`) = `r round(rq2$tests$X2$statistic, 0)`, $p < .001$. The likelihood of a diagnosis of a chronic condition with depression, was `r round(rq2$tests$odds$Odds, 2)` times the likelihood of a diagnosis of chronic disease without a diagnosis of depression. 
 
-`r figr("rq2FreqTbl", TRUE, type="Table")`, `r figr("rq2PropTbl", TRUE, type="Table")` and `r figr("rq2Plots", TRUE, type="Figure")` present a total of `r sum(rq2$tables$freq)` responses. Of those reporting a diagnosis of depression, `r round(rq2$tables$prop[1,1] * 100, 1)`% also had diagnoses of chronic illness. The proportion of diagnoses of chronic illness among those not reporting a prior diagnosis of depression dropped significantly to `r round(rq2$tables$prop[2,1] * 100, 1)`%.
+`r kfigr::figr("rq2FreqTbl", prefix = TRUE,  link = TRUE, type = "Table")`, `r kfigr::figr("rq2PropTbl", prefix = TRUE,  link = TRUE, type = "Table")` and `r kfigr::figr("rq2Plots", prefix = TRUE,  link = TRUE, type = "Figure")` present a total of `r sum(rq2$tables$freq)` responses. Of those reporting a diagnosis of depression, `r round(rq2$tables$prop[1,1] * 100, 1)`% also had diagnoses of chronic illness. The proportion of diagnoses of chronic illness among those not reporting a prior diagnosis of depression dropped significantly to `r round(rq2$tables$prop[2,1] * 100, 1)`%.
 
 <div class = 'col2'>
-`r figr("rq2FreqTbl", TRUE, type="Table")`: Depression and chronic illness contingency table
+`r kfigr::figr("rq2FreqTbl", prefix = TRUE,  link = TRUE, type = "Table")`: Depression and chronic illness contingency table
 ```{r rq2FreqTbl, include=T, echo = F, results='asis'}
-stargazer(format(rq2$tables$freq, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+stargazer::stargazer(format(rq2$tables$freq, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
 ``` 
 
-`r figr("rq2PropTbl", TRUE, type="Table")`: Depression and chronic illness contingency table
+`r kfigr::figr("rq2PropTbl", prefix = TRUE,  link = TRUE, type = "Table")`: Depression and chronic illness contingency table
 ```{r rq2PropTbl, include=T, echo = F, results='asis'}
-stargazer(format(rq2$tables$prop, quote = FALSE, digits = 2, justify = "right", big.mark = ","), type = 'html')
+stargazer::stargazer(format(rq2$tables$prop, quote = FALSE, digits = 2, justify = "right", big.mark = ","), type = 'html')
 ``` 
 </div>
 
 ```{r rq2Plots, include=T, echo = F, results='html'}
-grid.arrange(rq2$plots$freq, rq2$plots$prop, ncol = 2, top = "Depression and Chronic Illness")
+gridExtra::grid.arrange(rq2$plots$freq, rq2$plots$prop, ncol = 2, top = "Depression and Chronic Illness")
 ``` 
-`r figr("rq2Plots", TRUE, type="Figure")`: Marginal frequencies and proportions of depression diagnoses by income category
+`r kfigr::figr("rq2Plots", prefix = TRUE,  link = TRUE, type = "Figure")`: Marginal frequencies and proportions of depression diagnoses by income category
 
-A Pearson's residuals analysis was administered to assess the relationship between the diagnoses of depression and chronic illness. `r figr("rq2Mosaic", TRUE, type="Figure")` shows a positive correlation between the two variables, n = `r sum(rq2$tables$freq)`, $p$ < 0.001. The colors indicate the degree of departure of the observed frequencies from expected frequencies under the model of independence. Blue indicates observed frequencies were greater than expected values; whereas, red denotes observed frequencies were less than expected.
+A Pearson's residuals analysis was administered to assess the relationship between the diagnoses of depression and chronic illness. `r kfigr::figr("rq2Mosaic", prefix = TRUE,  link = TRUE, type = "Figure")` shows a positive correlation between the two variables, n = `r sum(rq2$tables$freq)`, $p$ < 0.001. The colors indicate the degree of departure of the observed frequencies from expected frequencies under the model of independence. Blue indicates observed frequencies were greater than expected values; whereas, red denotes observed frequencies were less than expected.
 
 ```{r rq2Mosaic, include=T, fig.height=8, fig.width=10, echo = F, results='html'}
-  mosaic(rq2$tables$r2, shade = TRUE, legend = TRUE,
-         labeling = labeling_border(rot_labels = c(0,0,0,0),
+  vcd::mosaic(rq2$tables$r2, shade = TRUE, legend = TRUE,
+         labeling = vcd::labeling_border(rot_labels = c(0,0,0,0),
                                    offset_labels = c(0,0,0,0), 
                                    varnames = c(TRUE, TRUE),
-                                   gp_labels = gpar(fontsize = 10),
+                                   gp_labels = grid::gpar(fontsize = 10),
                                    just_labels = c("left", 
                                                    "center", 
                                                    "center", 
                                                    "right")))
 ``` 
-`r figr("rq2Mosaic", TRUE, type="Figure")`: Mosaic plot of depression and chronic illness association
+`r kfigr::figr("rq2Mosaic", prefix = TRUE,  link = TRUE, type = "Figure")`: Mosaic plot of depression and chronic illness association
 
 A chi-squared test of independence was administered with a significance level $\alpha$ = .05, under the following hypotheses:
 
@@ -680,40 +702,40 @@ In conclusion, the differences in proportions were statistically significant, $X
 Is there a relationship between depression, chronic illness, and productivity? Marginally speaking, those with a diagnosis of depression reported `r round((rq3$stats$depression$Mean[1] / rq3$stats$depression$Mean[2] * 100) - 100, 1)`% more sick days than those without a diagnosis. The average marginal effect of a diagnosis of chronic illness was `r round((rq3$stats$chronic$Mean[1] / rq3$stats$chronic$Mean[2] * 100) - 100, 1)`% on the number of sick days. The greatest effect was observed among those with diagnoses of both depression and chronic illness. This group reported `r round((rq3$stats$interaction[1,8]$Mean / mean(rq3$stats$interaction[2,8]$Mean, rq3$stats$interaction[3,8]$Mean) * 100) - 100, 1)`% more sick days than those with a single diagnosis of either depression or one or more chronic conditions.
 
 ### Depression and Productivity
-What is the effect of depression on productivity? The descriptive statistics in `r figr("rq3DepressionStats", TRUE, type="Table")` reveal a difference of `r round(rq3$stats$depression$Mean[1] - rq3$stats$depression$Mean[2], 2)` days on average, a significant result as the following analysis shows. 
+What is the effect of depression on productivity? The descriptive statistics in `r kfigr::figr("rq3DepressionStats", prefix = TRUE,  link = TRUE, type = "Table")` reveal a difference of `r round(rq3$stats$depression$Mean[1] - rq3$stats$depression$Mean[2], 2)` days on average, a significant result as the following analysis shows. 
 
-`r figr("rq3DepressionStats", TRUE, type="Table")`: Descriptive Statistics of Sick Days by Depression Diagnosis 
+`r kfigr::figr("rq3DepressionStats", prefix = TRUE,  link = TRUE, type = "Table")`: Descriptive Statistics of Sick Days by Depression Diagnosis 
 ```{r rq3DepressionStats, echo = F, message = FALSE, warning=FALSE}
-kable(rq3$stats$depression) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = T, position = "center")
+knitr::kable(rq3$stats$depression) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = T, position = "center")
 ```
 
-`r figr("rq3DepressionBar", TRUE, type="Figure")` illuminates the frequency and proportions of reports of sick days vis-a-vis a diagnosis of depression. A total of `r sum(rq3$tables$depressionFreqTbl[,2])` reported one or more sick days, of that number `r round(sum(rq3$tables$depressionFreqTbl[1,2]) / sum(rq3$tables$depressionFreqTbl[,2]) * 100, 1)`% reported a diagnosis of depression. That said, the bar chart on the right reveals that a respondent with a diagnosis of depression was `r round(((rq3$tables$depressionFreqTbl[1,2] / rq3$tables$depressionFreqTbl[1,1]) / (rq3$tables$depressionFreqTbl[2,2] / rq3$tables$depressionFreqTbl[2,1])), 2) ` times as likely to have one or more sick days in a month than those without a diagnosis of depression.   
+`r kfigr::figr("rq3DepressionBar", prefix = TRUE,  link = TRUE, type = "Figure")` illuminates the frequency and proportions of reports of sick days vis-a-vis a diagnosis of depression. A total of `r sum(rq3$tables$depressionFreqTbl[,2])` reported one or more sick days, of that number `r round(sum(rq3$tables$depressionFreqTbl[1,2]) / sum(rq3$tables$depressionFreqTbl[,2]) * 100, 1)`% reported a diagnosis of depression. That said, the bar chart on the right reveals that a respondent with a diagnosis of depression was `r round(((rq3$tables$depressionFreqTbl[1,2] / rq3$tables$depressionFreqTbl[1,1]) / (rq3$tables$depressionFreqTbl[2,2] / rq3$tables$depressionFreqTbl[2,1])), 2) ` times as likely to have one or more sick days in a month than those without a diagnosis of depression.   
 
 ```{r rq3DepressionBar, include=T, echo = F, results='html'}
-grid.arrange(rq3$plots$depressionFreqBar, rq3$plots$depressionPropBar, ncol = 2, top = 'Depression and Reports of One or More Sick Days')
+gridExtra::grid.arrange(rq3$plots$depressionFreqBar, rq3$plots$depressionPropBar, ncol = 2, top = 'Depression and Reports of One or More Sick Days')
 ``` 
-`r figr("rq3DepressionBar", TRUE, type="Figure")`: Depression and Reports of Health-Related Restricted Activity
+`r kfigr::figr("rq3DepressionBar", prefix = TRUE,  link = TRUE, type = "Figure")`: Depression and Reports of Health-Related Restricted Activity
 
 Next, the distributions of sick days between the groups are examined.
 
 ```{r rq3DepressionBox, include=T, echo = F, results='html'}
-grid.arrange(rq3$plots$depressionViolin, rq3$plots$depressionBox, ncol = 2, top = "Distribution Summary of Reports of Sick Days by Diagnosis of Chronic Illness")
+gridExtra::grid.arrange(rq3$plots$depressionViolin, rq3$plots$depressionBox, ncol = 2, top = "Distribution Summary of Reports of Sick Days by Diagnosis of Chronic Illness")
 ``` 
-`r figr("rq3DepressionBox", TRUE, type="Figure")`: Distribution Summary of Reports of Sick Days by Diagnosis of Depression
+`r kfigr::figr("rq3DepressionBox", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution Summary of Reports of Sick Days by Diagnosis of Depression
 
-As indicated in `r figr("rq3DepressionBox", TRUE, type="Figure")` the distribution of sick days for those reporting diagnoses of depression was more narrow in the extremes, with a substantially larger interquartile range.  For the group without diagnoses of depression, the reported sick days more closely centered around its median of zero days.
+As indicated in `r kfigr::figr("rq3DepressionBox", prefix = TRUE,  link = TRUE, type = "Figure")` the distribution of sick days for those reporting diagnoses of depression was more narrow in the extremes, with a substantially larger interquartile range.  For the group without diagnoses of depression, the reported sick days more closely centered around its median of zero days.
 
 ```{r rq3DepressionHist1, include=T, echo = F, results='html'}
 rq3$plots$depressionHist1
 ``` 
-`r figr("rq3DepressionHist1", TRUE, type="Figure")`: Distribution of Sick Days by Diagnosis of Depression
+`r kfigr::figr("rq3DepressionHist1", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution of Sick Days by Diagnosis of Depression
 
-As implied by `r figr("rq3DepressionBox", TRUE, type="Figure")`, both distributions peak at zero days; however, the group without depression had substantially higher reports of zero sick days.  To get a better sense of the distribution, reports of zero sick days were removed from the data set and a new density plot was rendered.  As `r figr("rq3DepressionHist1", TRUE, type="Figure")` reveals, the group reporting depression had higher frequencies of reports of longer bouts of restricted activity.
+As implied by `r kfigr::figr("rq3DepressionBox", prefix = TRUE,  link = TRUE, type = "Figure")`, both distributions peak at zero days; however, the group without depression had substantially higher reports of zero sick days.  To get a better sense of the distribution, reports of zero sick days were removed from the data set and a new density plot was rendered.  As `r kfigr::figr("rq3DepressionHist1", prefix = TRUE,  link = TRUE, type = "Figure")` reveals, the group reporting depression had higher frequencies of reports of longer bouts of restricted activity.
 ```{r rq3DepressionHist2, include=T, echo = F, results='html'}
 rq3$plots$depressionHist2
 ``` 
-`r figr("rq3DepressionHist1", TRUE, type="Figure")`: Distribution of One or More Sick Days by Diagnosis of Depression
+`r kfigr::figr("rq3DepressionHist1", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution of One or More Sick Days by Diagnosis of Depression
 
 To validate the impact of depression on productivity, a Mann-Whitney-Wilcoxon test was administered with a significance level $\alpha$ - .05, under the following hypotheses:
 
@@ -724,38 +746,38 @@ Though the medians were the same, there was a statistically significant differen
 
 
 ### Chronic Illness and Productivity
-What is the effect of chronic disease on productivity? `r figr("rq3ChronicStats", TRUE, type="Table")` exhibits a `r round(rq3$stats$chronic$Mean[1] - rq3$stats$chronic$Mean[2], 2)` day difference in the mean number sick days. The following analysis explores the significance and effect of this difference.
+What is the effect of chronic disease on productivity? `r kfigr::figr("rq3ChronicStats", prefix = TRUE,  link = TRUE, type = "Table")` exhibits a `r round(rq3$stats$chronic$Mean[1] - rq3$stats$chronic$Mean[2], 2)` day difference in the mean number sick days. The following analysis explores the significance and effect of this difference.
 
-`r figr("rq3ChronicStats", TRUE, type="Table")`: Descriptive Statistics of Restricted Activity Days by Chronic Disease Diagnosis 
+`r kfigr::figr("rq3ChronicStats", prefix = TRUE,  link = TRUE, type = "Table")`: Descriptive Statistics of Restricted Activity Days by Chronic Disease Diagnosis 
 ```{r rq3ChronicStats, echo = F, message = FALSE, warning=FALSE}
-kable(rq3$stats$chronic) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
+knitr::kable(rq3$stats$chronic) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
 ```
 
-The frequency and proportion tables in `r figr("rq3ChronicBar", TRUE, type="Figure")` cite a total of `r sum(rq3$tables$chronicFreqTbl[,2])` respondents who reported one or more sick days, of that number `r round(sum(rq3$tables$chronicFreqTbl[1,2]) / sum(rq3$tables$chronicFreqTbl[,2]) * 100, 1)`% reported a diagnosis of chronic illness. Respondents with a diagnosis of chronic illness were `r round(((rq3$tables$chronicFreqTbl[1,2] / rq3$tables$chronicFreqTbl[1,1]) / (rq3$tables$chronicFreqTbl[2,2] / rq3$tables$chronicFreqTbl[2,1])), 2) ` times as likely to have one or more sick days in a month than those without a diagnosis of chronic illness.   
+The frequency and proportion tables in `r kfigr::figr("rq3ChronicBar", prefix = TRUE,  link = TRUE, type = "Figure")` cite a total of `r sum(rq3$tables$chronicFreqTbl[,2])` respondents who reported one or more sick days, of that number `r round(sum(rq3$tables$chronicFreqTbl[1,2]) / sum(rq3$tables$chronicFreqTbl[,2]) * 100, 1)`% reported a diagnosis of chronic illness. Respondents with a diagnosis of chronic illness were `r round(((rq3$tables$chronicFreqTbl[1,2] / rq3$tables$chronicFreqTbl[1,1]) / (rq3$tables$chronicFreqTbl[2,2] / rq3$tables$chronicFreqTbl[2,1])), 2) ` times as likely to have one or more sick days in a month than those without a diagnosis of chronic illness.   
 
 ```{r rq3ChronicBar, include=T, echo = F, results='html'}
-grid.arrange(rq3$plots$chronicFreqBar, rq3$plots$chronicPropBar, ncol = 2, top = 'Chronic Illness and Reports of One or More Sick Days')
+gridExtra::grid.arrange(rq3$plots$chronicFreqBar, rq3$plots$chronicPropBar, ncol = 2, top = 'Chronic Illness and Reports of One or More Sick Days')
 ``` 
-`r figr("rq3ChronicBar", TRUE, type="Figure")`: Chronic Illness and Reports of Health-Related Restricted Activity
+`r kfigr::figr("rq3ChronicBar", prefix = TRUE,  link = TRUE, type = "Figure")`: Chronic Illness and Reports of Health-Related Restricted Activity
 
 ```{r rq3ChronicBox, include=T, echo = F, results='html'}
-grid.arrange(rq3$plots$chronicViolin, rq3$plots$chronicBox, ncol = 2, top = "Distribution Summary of Reports of Sick Days by Diagnosis of Chronic Illness")
+gridExtra::grid.arrange(rq3$plots$chronicViolin, rq3$plots$chronicBox, ncol = 2, top = "Distribution Summary of Reports of Sick Days by Diagnosis of Chronic Illness")
 ``` 
-`r figr("rq3ChronicBox", TRUE, type="Figure")`: Distribution Summary of Reports of Sick Days by Diagnosis of Chronic Illness
+`r kfigr::figr("rq3ChronicBox", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution Summary of Reports of Sick Days by Diagnosis of Chronic Illness
 
-The violin and box plots in `r figr("rq3ChronicBox", TRUE, type="Figure")` show two different distributions, one characterized by a relatively wide spread, the other centered around its median of zero days. The group reporting chronic illness reported up to ten sick days, 75% of the time; whereas, the other group reported no more than two sick days, 75% of the time. 
+The violin and box plots in `r kfigr::figr("rq3ChronicBox", prefix = TRUE,  link = TRUE, type = "Figure")` show two different distributions, one characterized by a relatively wide spread, the other centered around its median of zero days. The group reporting chronic illness reported up to ten sick days, 75% of the time; whereas, the other group reported no more than two sick days, 75% of the time. 
 
 ```{r rq3ChronicHist1, include=T, echo = F, results='html'}
 rq3$plots$chronicHist1
 ``` 
-`r figr("rq3ChronicHist2", TRUE, type="Figure")`: Distribution of Sick Days by Diagnosis of Chronic Illness
+`r kfigr::figr("rq3ChronicHist2", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution of Sick Days by Diagnosis of Chronic Illness
 
-As evidenced by `r figr("rq3ChronicBox", TRUE, type="Figure")`, both distributions peak at zero days, in fact, zero days was not only the mean but the mode for this measure. `r figr("rq3ChronicHist1", TRUE, type="Figure")` shows a magnified view of the distribution, created by removing reports of zero days. The group with the diagnoses had consistently higher frequencies of longer bouts of restricted activity. 
+As evidenced by `r kfigr::figr("rq3ChronicBox", prefix = TRUE,  link = TRUE, type = "Figure")`, both distributions peak at zero days, in fact, zero days was not only the mean but the mode for this measure. `r kfigr::figr("rq3ChronicHist1", prefix = TRUE,  link = TRUE, type = "Figure")` shows a magnified view of the distribution, created by removing reports of zero days. The group with the diagnoses had consistently higher frequencies of longer bouts of restricted activity. 
 ```{r rq3ChronicHist2, include=T, echo = F, results='html'}
 rq3$plots$chronicHist2
 ``` 
-`r figr("rq3ChronicHist2", TRUE, type="Figure")`: Distribution of One or More Sick Days by Diagnosis of Chronic Illness
+`r kfigr::figr("rq3ChronicHist2", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution of One or More Sick Days by Diagnosis of Chronic Illness
 
 A Mann-Whitney-Wilcoxon test was administered to confirm the assertion that chronic illness was associated with loss productivity. Setting the probability of a type II error at $\alpha$ =.05, the following hypotheses were tested:
 
@@ -768,75 +790,75 @@ Though the result was significant, $U$ = (`r round(rq3$tests$chronicTest$statist
 ### Depression Chronic Illness and Productivity
 To what degree does depression with co-occurring chronic illness effect productivity, vis-a-vis that of diagnoses of depression or chronic illness separately? Those with both depression and chronic illness diagnoses, had on average, `r round(rq3$stats$interaction$Mean[1] / rq3$stats$interaction$Mean[2] * 100, 1)`% more days of health-related restricted activity, than those that had either depression, or another chronic condition, or had neither. This analysis examines the significance, and effect of concurrent depression and chronic illness on productivity.
 
-`r figr("rq3InteractionFreqTbl", TRUE, type="Table")` and `r figr("rq3InteractionPropTbl", TRUE, type="Table")` outline the frequencies and proportions reporting sick days over the month preceding the survey, by diagnoses of chronic conditions or depression. Of a total of `r sum(rq3$tables$interactionFreqTbl)` respondents, `r round(sum(rq3$tables$interactionFreqTbl[,2]) / sum(rq3$tables$interactionFreqTbl) * 100, 1)`% reported one or more sick days during the month preceding the survey and `r round(sum(rq3$tables$interactionFreqTbl[1,2]) / sum(rq3$tables$interactionFreqTbl[,2]) * 100, 1)`% of that group had diagnoses of both depression and chronic illness.
+`r kfigr::figr("rq3InteractionFreqTbl", prefix = TRUE,  link = TRUE, type = "Table")` and `r kfigr::figr("rq3InteractionPropTbl", prefix = TRUE,  link = TRUE, type = "Table")` outline the frequencies and proportions reporting sick days over the month preceding the survey, by diagnoses of chronic conditions or depression. Of a total of `r sum(rq3$tables$interactionFreqTbl)` respondents, `r round(sum(rq3$tables$interactionFreqTbl[,2]) / sum(rq3$tables$interactionFreqTbl) * 100, 1)`% reported one or more sick days during the month preceding the survey and `r round(sum(rq3$tables$interactionFreqTbl[1,2]) / sum(rq3$tables$interactionFreqTbl[,2]) * 100, 1)`% of that group had diagnoses of both depression and chronic illness.
 
 <center>
-`r figr("rq3InteractionFreqTbl", TRUE, type="Table")`: Frequencies of Reports of Health-Related Restricted Activity, Depression, and Chronic Illness
+`r kfigr::figr("rq3InteractionFreqTbl", prefix = TRUE,  link = TRUE, type = "Table")`: Frequencies of Reports of Health-Related Restricted Activity, Depression, and Chronic Illness
 ```{r rq3InteractionFreqTbl, include=T, echo = F, results='asis'}
-stargazer(format(rq3$tables$interactionFreqTbl, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+stargazer::stargazer(format(rq3$tables$interactionFreqTbl, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
 ``` 
 </center>
 
 <center>
-`r figr("rq3InteractionPropTbl", TRUE, type="Table")`: Proportions of Reports of Health-Related Restricted Activity, Depression, and Chronic Illness
+`r kfigr::figr("rq3InteractionPropTbl", prefix = TRUE,  link = TRUE, type = "Table")`: Proportions of Reports of Health-Related Restricted Activity, Depression, and Chronic Illness
 ```{r rq3InteractionPropTbl, include=T, echo = F, results='asis'}
-stargazer(format(rq3$tables$interactionPropTbl, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+stargazer::stargazer(format(rq3$tables$interactionPropTbl, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
 ``` 
 </center>
 
-`r figr("rq3Mosaic", TRUE, type="Figure")` illuminates the degree to which the frequencies of reports depart from expected under the independence model. If the null hypothesis of the independence of chronic illness and depression from productivity held, those with chronic illness and depression diagnoses would report fewer sick days and those without a diagnosis of depression, either with or without chronic illness would have reported more sick days.
+`r kfigr::figr("rq3Mosaic", prefix = TRUE,  link = TRUE, type = "Figure")` illuminates the degree to which the frequencies of reports depart from expected under the independence model. If the null hypothesis of the independence of chronic illness and depression from productivity held, those with chronic illness and depression diagnoses would report fewer sick days and those without a diagnosis of depression, either with or without chronic illness would have reported more sick days.
 
 
 ```{r rq3Mosaic, include=T, fig.height=6, fig.width=10, echo = F, results='html'}
-  mosaic(rq3$tables$interactionTbl, shade = TRUE, legend = TRUE,
-         labeling= labeling_border(rot_labels = c(0,0,0,0), 
+  vcd::mosaic(rq3$tables$interactionTbl, shade = TRUE, legend = TRUE,
+         labeling= vcd::labeling_border(rot_labels = c(0,0,0,0), 
                                    varnames = c(TRUE, TRUE),
-                                   gp_labels = gpar(fontsize = 10),
+                                   gp_labels = grid::gpar(fontsize = 10),
                                    just_labels = c("left", 
                                                    "center", 
                                                    "center", 
                                                    "right")))
 ``` 
-`r figr("rq3Mosaic", TRUE, type="Figure")`: Mosaic plot of depression, chronic illness, and productivity
+`r kfigr::figr("rq3Mosaic", prefix = TRUE,  link = TRUE, type = "Figure")`: Mosaic plot of depression, chronic illness, and productivity
 
-`r figr("rq3InteractionStats", TRUE, type="Table")` reveals significant differences in mean number of sick days reported by diagnosis. Naturally, those with neither diagnosis reported the lowest number of restricted activity days; however, the number increased `r round((mean(rq3$stats$interaction[3,8]$Mean, rq3$stats$interaction[2,8]$Mean) / rq3$stats$interaction[4,8]$Mean * 100) - 100, 1)`% for those having either a diagnosis of depression or one or more chronic conditions. Those reporting both diagnoses reported, on average, `r round((rq3$stats$interaction[1,8]$Mean / mean(rq3$stats$interaction[2,8]$Mean, rq3$stats$interaction[3,8]$Mean) * 100) - 100, 1)`% more sick days than those having a single diagnosis of either depression or one or more chronic conditions.
+`r kfigr::figr("rq3InteractionStats", prefix = TRUE,  link = TRUE, type = "Table")` reveals significant differences in mean number of sick days reported by diagnosis. Naturally, those with neither diagnosis reported the lowest number of restricted activity days; however, the number increased `r round((mean(rq3$stats$interaction[3,8]$Mean, rq3$stats$interaction[2,8]$Mean) / rq3$stats$interaction[4,8]$Mean * 100) - 100, 1)`% for those having either a diagnosis of depression or one or more chronic conditions. Those reporting both diagnoses reported, on average, `r round((rq3$stats$interaction[1,8]$Mean / mean(rq3$stats$interaction[2,8]$Mean, rq3$stats$interaction[3,8]$Mean) * 100) - 100, 1)`% more sick days than those having a single diagnosis of either depression or one or more chronic conditions.
 
-`r figr("rq3InteractionStats", TRUE, type="Table")`: Descriptive Statistics of Restricted Activity Days by Chronic Disease and Depression Diagnoses
+`r kfigr::figr("rq3InteractionStats", prefix = TRUE,  link = TRUE, type = "Table")`: Descriptive Statistics of Restricted Activity Days by Chronic Disease and Depression Diagnoses
 ```{r rq3InteractionStats, echo = F, message = FALSE, warning=FALSE}
-kable(rq3$stats$interaction) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
+knitr::kable(rq3$stats$interaction) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
 ```
 
 
 ```{r rq3InteractionBox, include=T, echo = F, results='html'}
-grid.arrange(rq3$plots$interactionViolin, rq3$plots$interactionBox, ncol = 2, top = "Depression and Chronic Illness and Summary of Distribution of Sick Days")
+gridExtra::grid.arrange(rq3$plots$interactionViolin, rq3$plots$interactionBox, ncol = 2, top = "Depression and Chronic Illness and Summary of Distribution of Sick Days")
 ``` 
-`r figr("rq3InteractionBox", TRUE, type="Figure")`: Distribution Summary of Reports of Sick Days by Diagnosis of Chronic Illness & Depression
+`r kfigr::figr("rq3InteractionBox", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution Summary of Reports of Sick Days by Diagnosis of Chronic Illness & Depression
 
-`r figr("rq3InteractionBox", TRUE, type="Figure")` shows a slight increase of `r round(rq3$stats$interaction[2,8]$Mean / rq3$stats$interaction[3,8]$Mean * 100, 1)`% for those with diagnoses of chronic illness; however, the mean number of sick days reported jumps another  `r round(rq3$stats$interaction[1,8]$Mean / rq3$stats$interaction[2,8]$Mean * 100, 1)`% for those with both diagnoses.  The upper quartile increases  `r round(rq3$stats$interaction[1,10]$Upper / rq3$stats$interaction[2,10]$Upper * 100, 1)`% to 20 days of the month. 
+`r kfigr::figr("rq3InteractionBox", prefix = TRUE,  link = TRUE, type = "Figure")` shows a slight increase of `r round(rq3$stats$interaction[2,8]$Mean / rq3$stats$interaction[3,8]$Mean * 100, 1)`% for those with diagnoses of chronic illness; however, the mean number of sick days reported jumps another  `r round(rq3$stats$interaction[1,8]$Mean / rq3$stats$interaction[2,8]$Mean * 100, 1)`% for those with both diagnoses.  The upper quartile increases  `r round(rq3$stats$interaction[1,10]$Upper / rq3$stats$interaction[2,10]$Upper * 100, 1)`% to 20 days of the month. 
 
 
 ```{r rq3InteractionHist1, include=T, echo = F, results='html'}
 rq3$plots$interactionHist1
 ```
-`r figr("rq3InteractionHist1", TRUE, type="Figure")`: Distribution of Sick Days by Diagnosis of Chronic Illness and Depression
+`r kfigr::figr("rq3InteractionHist1", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution of Sick Days by Diagnosis of Chronic Illness and Depression
 
-The distribution depicted in `r figr("rq3InteractionHist1", TRUE, type="Figure")` is distorted by heavy right skew and the reports of zero sick days.  Removing the reports of zero sick days from the data set exposed the shape of the distribution of reports of one or more days of health-related restricted activity.  
+The distribution depicted in `r kfigr::figr("rq3InteractionHist1", prefix = TRUE,  link = TRUE, type = "Figure")` is distorted by heavy right skew and the reports of zero sick days.  Removing the reports of zero sick days from the data set exposed the shape of the distribution of reports of one or more days of health-related restricted activity.  
 
 
 ```{r rq3InteractionHist2, include=T, echo = F, results='html'}
 rq3$plots$interactionHist2
 ```
-`r figr("rq3InteractionHist2", TRUE, type="Figure")`: Distribution of Sick Days by Diagnosis of Chronic Illness and Depression
+`r kfigr::figr("rq3InteractionHist2", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution of Sick Days by Diagnosis of Chronic Illness and Depression
 
-The white in `r figr("rq3InteractionHist2", TRUE, type="Figure")` represents the reports of those with neither diagnosis and the dark green end of the spectrum symbolizes the reports of those with both diagnoses. The left side is dominated by light colors, representing those without either diagnosis reporting between zero and five sick days during the month preceding the survey.  Moving right, the plot gets darker with increasing reports from those with one or both diagnoses of longer periods of restricted activity. 
+The white in `r kfigr::figr("rq3InteractionHist2", prefix = TRUE,  link = TRUE, type = "Figure")` represents the reports of those with neither diagnosis and the dark green end of the spectrum symbolizes the reports of those with both diagnoses. The left side is dominated by light colors, representing those without either diagnosis reporting between zero and five sick days during the month preceding the survey.  Moving right, the plot gets darker with increasing reports from those with one or both diagnoses of longer periods of restricted activity. 
 
-`r figr("rq3InteractionPlot", TRUE, type="Figure")` illustrates how the effect of chronic illness on productivity depends upon the occurrence of a diagnosis of depression.  
+`r kfigr::figr("rq3InteractionPlot", prefix = TRUE,  link = TRUE, type = "Figure")` illustrates how the effect of chronic illness on productivity depends upon the occurrence of a diagnosis of depression.  
 
 ```{r rq3InteractionPlot, include=T, echo = F, results='html'}
-  interactionPlot <- plot(allEffects(rq3$tests$interactionModel), multiline=TRUE, ci.style="bars")
+  interactionPlot <- plot(effects::allEffects(rq3$tests$interactionModel), multiline=TRUE, ci.style="bars")
 ```
-`r figr("rq3InteractionPlot", TRUE, type="Figure")`: Interaction between the diagnoses of depression and chronic illness and their effects on productivity.
+`r kfigr::figr("rq3InteractionPlot", prefix = TRUE,  link = TRUE, type = "Figure")`: Interaction between the diagnoses of depression and chronic illness and their effects on productivity.
 
 The red line indicates depression's main effect on sick days, without a diagnosis of chronic illness, whereby going from no to yes results in about five sick days. If, however, there is a diagnosis of chronic illness, the introduction of depression almost doubles its effect on sick days. A Kruskal-Wallis test was conducted to confirm the interactive effects of chronic illness and depression on productivity. With a significance level $\alpha$ = .05, the following hypotheses were tested.  
 
@@ -852,13 +874,13 @@ $H_a$ There is a difference in the number of sick days between those without dia
 $H_a$ There is a difference in the number of sick days between those with a diagnosis of depression, without concurrent chronic illness and those with a diagnosis of chronic illness, without concurrent depression      
 $H_a$ There is a difference in the number of sick days between those with a diagnosis of chronic illness, without concurrent depression and those with both diagnoses       
 
-The results of the tests are summarized in `r figr("rq3Pairwise", TRUE, type="Table")`.
+The results of the tests are summarized in `r kfigr::figr("rq3Pairwise", prefix = TRUE,  link = TRUE, type = "Table")`.
 
-`r figr("rq3Pairwise", TRUE, type="Table")`: Pairwise Mann-Whitney-Wilcoxon tests of depression and chronic illness on productivity
+`r kfigr::figr("rq3Pairwise", prefix = TRUE,  link = TRUE, type = "Table")`: Pairwise Mann-Whitney-Wilcoxon tests of depression and chronic illness on productivity
 ```{r rq3Pairwise, echo = F, message = FALSE, warning=FALSE}
-kable(rq3$tests$pairwise) %>% 
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
-  add_header_above(c(" " = 1, "Group A" = 2, "Group B" = 2, " " = 6))
+knitr::kable(rq3$tests$pairwise) %>% 
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  kableExtra::add_header_above(c(" " = 1, "Group A" = 2, "Group B" = 2, " " = 6))
 ```
 The differences in the effect on productivity were significant, $X^2$ from `r min(rq3$tests$pairwise$X2)` to `r max(rq3$tests$pairwise$X2)`, $p$ < .001. As hypothesized, the largest positive effect size and location parameter were between the reports from those with both diagnoses and those with only one. 
 
@@ -866,7 +888,7 @@ Which chronic diseases have the greatest impact on productivity?  The following 
 ```{r rq3AllChronicPlot, include=T, echo = F, results='html'}
   rq3$plots$allChronic
 ```
-`r figr("rq3AllChronicPlot", TRUE, type="Figure")`: Sick days during preceding 30 days by chronic condition
+`r kfigr::figr("rq3AllChronicPlot", prefix = TRUE,  link = TRUE, type = "Figure")`: Sick days during preceding 30 days by chronic condition
 
 Of the ten chronic diseases analyzed, depression had the greatest impact on productivity, reporting `r round(((rq3$stats$allChronic[1,8] / rq3$stats$allChronic[2,8] * 100) - 100), 2)`% more sick days than `r tolower(rq3$stats$allChronic[2,2])`, the second most impacting condition and `r round(((rq3$stats$allChronic[1,8] / mean(rq3$stats$allChronic[2:11,8]) * 100) - 100), 2)`% greater productivity loss than the average of all chronic conditions.
 
@@ -875,31 +897,31 @@ In closing, concurrent depression and chronic illness had a drastic impact on pr
 Is there a relationship between depression, chronic illness and the use of health care services? Marginally speaking, those with a diagnosis of depression visited the doctor `r round((rq4$stats$depression$Mean[1] / rq4$stats$depression$Mean[2] * 100) - 100, 1)`% more often than those without a diagnosis. The average marginal effect of a diagnosis of chronic illness was `r round((rq4$stats$chronic$Mean[1] / rq4$stats$chronic$Mean[2] * 100) - 100, 1)`% on the number of doctor visits. The greatest effect was observed among those with diagnoses of both depression and chronic illness. This group visited the doctor `r round((rq4$stats$interaction[1,8]$Mean / mean(rq4$stats$interaction[2,8]$Mean, rq4$stats$interaction[3,8]$Mean) * 100) - 100, 1)`% more often than those with a single diagnosis of either depression or one or more chronic conditions.    
 
 ### Depression and Use health care Services
-First, the marginal effects of depression diagnoses on the use of health care services are investigated. As shown in `r figr("rq4DepressionStats", TRUE, type="Table")` those with depression diagnoses reported, on average `r round((rq4$stats$depression$Mean[1] / rq4$stats$depression$Mean[2] * 100) - 100, 1)`% greater number of Dr. visits in the 12 months preceding the survey, than those without a diagnosis of depression. As the data were significantly right-skewed, the median number of Dr. visits for those with a depression diagnosis was `r round((rq4$stats$depression$Median[1] / rq4$stats$depression$Median[2] * 100) - 100, 1)`% greater. 
+First, the marginal effects of depression diagnoses on the use of health care services are investigated. As shown in `r kfigr::figr("rq4DepressionStats", prefix = TRUE,  link = TRUE, type = "Table")` those with depression diagnoses reported, on average `r round((rq4$stats$depression$Mean[1] / rq4$stats$depression$Mean[2] * 100) - 100, 1)`% greater number of Dr. visits in the 12 months preceding the survey, than those without a diagnosis of depression. As the data were significantly right-skewed, the median number of Dr. visits for those with a depression diagnosis was `r round((rq4$stats$depression$Median[1] / rq4$stats$depression$Median[2] * 100) - 100, 1)`% greater. 
 
-`r figr("rq4DepressionStats", TRUE, type="Table")`: Descriptive Statistics of effect of depression on the number of Dr. visits in 12 month period
+`r kfigr::figr("rq4DepressionStats", prefix = TRUE,  link = TRUE, type = "Table")`: Descriptive Statistics of effect of depression on the number of Dr. visits in 12 month period
 ```{r rq4DepressionStats, echo = F, message = FALSE, warning=FALSE}
-kable(rq4$stats$depression) %>% 
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
+knitr::kable(rq4$stats$depression) %>% 
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
 ```
-`r figr("rq4DepressionBox", TRUE, type="Figure")` graphically displays the two distributions quantitatively described above. The group with depression diagnoses had a higher number of reports of five or more Dr. visits in the year preceding the survey. The reports of Dr. visits among those without a diagnosis had a lower and wider center $Med$ = `r rq4$stats$depression$Median[2]`, $\bar{x}$ = `r rq4$stats$depression$Mean[2]`.
+`r kfigr::figr("rq4DepressionBox", prefix = TRUE,  link = TRUE, type = "Figure")` graphically displays the two distributions quantitatively described above. The group with depression diagnoses had a higher number of reports of five or more Dr. visits in the year preceding the survey. The reports of Dr. visits among those without a diagnosis had a lower and wider center $Med$ = `r rq4$stats$depression$Median[2]`, $\bar{x}$ = `r rq4$stats$depression$Mean[2]`.
 
 ```{r rq4DepressionBox, include=T, echo = F, results='html'}
-grid.arrange(rq4$plots$depressionViolin, rq4$plots$depressionBox, ncol = 2, top = "Depression and Summary Distribution of Dr. Visits")
+gridExtra::grid.arrange(rq4$plots$depressionViolin, rq4$plots$depressionBox, ncol = 2, top = "Depression and Summary Distribution of Dr. Visits")
 ```
-`r figr("rq4DepressionBox", TRUE, type="Figure")`: Depression and summary of distribution of Dr. visits
+`r kfigr::figr("rq4DepressionBox", prefix = TRUE,  link = TRUE, type = "Figure")`: Depression and summary of distribution of Dr. visits
 
-The histogram echos the results from the box plot and adds greater detail of the distribution of reports of five visits or more.  In `r figr("rq4DepressionHist1", TRUE, type="Figure")`, the group with diagnoses of depression reported five Dr. visits or more, as frequently or more frequently than those without a diagnosis (`r figr("rq4DepressionHist2", TRUE, type="Figure")`). 
+The histogram echos the results from the box plot and adds greater detail of the distribution of reports of five visits or more.  In `r kfigr::figr("rq4DepressionHist1", prefix = TRUE,  link = TRUE, type = "Figure")`, the group with diagnoses of depression reported five Dr. visits or more, as frequently or more frequently than those without a diagnosis (`r kfigr::figr("rq4DepressionHist2", prefix = TRUE,  link = TRUE, type = "Figure")`). 
 
 ```{r rq4DepressionHist1, include=T, echo = F, results='html'}
 rq4$plots$depressionHist1
 ```
-`r figr("rq4DepressionHist1", TRUE, type="Figure")`: Distribution of Dr. Visits by Diagnosis of Depression
+`r kfigr::figr("rq4DepressionHist1", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution of Dr. Visits by Diagnosis of Depression
 
 ```{r rq4DepressionHist2, include=T, echo = F, results='html'}
 rq4$plots$depressionHist2
 ```
-`r figr("rq4DepressionHist2", TRUE, type="Figure")`: Distribution of five or more Dr. Visits by Diagnosis of Depression
+`r kfigr::figr("rq4DepressionHist2", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution of five or more Dr. Visits by Diagnosis of Depression
 
 Given the skewness in the data, the non-parametric Mann-Whitney-Wilcoxon test was administered with a significance of $\alpha$ =.05 to determine whether those with a diagnosis of depression visited the Dr. more frequently than those without a diagnosis. The hypotheses were as follows:
 
@@ -909,32 +931,32 @@ $H_a$ Depression has an effect on the number of Dr. Visits between the groups.
 The test indicated that those with depression visited the Dr. more frequently (Mdn = `r rq4$stats$depression$Median[1]`), than those without a diagnosis (Mdn = `r rq4$stats$depression$Median[2]`), $U$ = `r rq4$tests$depressionTest$statistic`, $p$ < .001, $r$ = `r round(rq4$tests$depressionEffect$statistic, 3)`.
 
 ### Chronic Illness and Use health care Services
-Considering the marginal effects of diagnoses of one or more chronic conditions, `r figr("rq4ChronicStats", TRUE, type="Table")` shows that those with chronic illness diagnoses reported, on average `r round((rq4$stats$chronic$Mean[1] / rq4$stats$chronic$Mean[2] * 100) - 100, 1)`% greater number of Dr. visits in the 12 months preceding the survey. The median number of Dr. visits for those with a chronic illness diagnosis was `r rq4$stats$chronic$Median[1]` versus those without a diagnosis, `r rq4$stats$chronic$Median[2]`, a `r round((rq4$stats$chronic$Median[1] / rq4$stats$chronic$Median[2] * 100) - 100, 1)`% difference. 
+Considering the marginal effects of diagnoses of one or more chronic conditions, `r kfigr::figr("rq4ChronicStats", prefix = TRUE,  link = TRUE, type = "Table")` shows that those with chronic illness diagnoses reported, on average `r round((rq4$stats$chronic$Mean[1] / rq4$stats$chronic$Mean[2] * 100) - 100, 1)`% greater number of Dr. visits in the 12 months preceding the survey. The median number of Dr. visits for those with a chronic illness diagnosis was `r rq4$stats$chronic$Median[1]` versus those without a diagnosis, `r rq4$stats$chronic$Median[2]`, a `r round((rq4$stats$chronic$Median[1] / rq4$stats$chronic$Median[2] * 100) - 100, 1)`% difference. 
 
-`r figr("rq4ChronicStats", TRUE, type="Table")`: Descriptive Statistics of effect of chronic illness on the number of Dr. visits in a 12 month period
+`r kfigr::figr("rq4ChronicStats", prefix = TRUE,  link = TRUE, type = "Table")`: Descriptive Statistics of effect of chronic illness on the number of Dr. visits in a 12 month period
 ```{r rq4ChronicStats, echo = F, message = FALSE, warning=FALSE}
-kable(rq4$stats$chronic) %>% 
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
+knitr::kable(rq4$stats$chronic) %>% 
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
 ```
-As indicated in `r figr("rq4ChronicBox", TRUE, type="Figure")`, the group with chronic illness diagnoses had a higher number of reports of five or more Dr. visits in the year preceding the survey. The reports of Dr. visits among those without a diagnosis had a lower and wider center of around `r rq4$stats$chronic$Median[2]` visits for the year.
+As indicated in `r kfigr::figr("rq4ChronicBox", prefix = TRUE,  link = TRUE, type = "Figure")`, the group with chronic illness diagnoses had a higher number of reports of five or more Dr. visits in the year preceding the survey. The reports of Dr. visits among those without a diagnosis had a lower and wider center of around `r rq4$stats$chronic$Median[2]` visits for the year.
 
 
 ```{r rq4ChronicBox, include=T, echo = F, results='html'}
-grid.arrange(rq4$plots$chronicViolin, rq4$plots$chronicBox, ncol = 2, top = "Chronic Illness and Summary Distribution of Dr. Visits")
+gridExtra::grid.arrange(rq4$plots$chronicViolin, rq4$plots$chronicBox, ncol = 2, top = "Chronic Illness and Summary Distribution of Dr. Visits")
 ```
-`r figr("rq4ChronicBox", TRUE, type="Figure")`: Chronic Illness and Summary of Distribution of Dr. Visits
+`r kfigr::figr("rq4ChronicBox", prefix = TRUE,  link = TRUE, type = "Figure")`: Chronic Illness and Summary of Distribution of Dr. Visits
 
-`r figr("rq4ChronicHist1", TRUE, type="Figure")`, visually represents the quantitative results above. The group with diagnoses of chronic illness reported five or more Dr. visits,  as frequently or more frequently than those without a diagnosis (`r figr("rq4ChronicHist2", TRUE, type="Figure")`). 
+`r kfigr::figr("rq4ChronicHist1", prefix = TRUE,  link = TRUE, type = "Figure")`, visually represents the quantitative results above. The group with diagnoses of chronic illness reported five or more Dr. visits,  as frequently or more frequently than those without a diagnosis (`r kfigr::figr("rq4ChronicHist2", prefix = TRUE,  link = TRUE, type = "Figure")`). 
 
 ```{r rq4ChronicHist1, include=T, echo = F, results='html'}
 rq4$plots$chronicHist1
 ```
-`r figr("rq4ChronicHist1", TRUE, type="Figure")`: Distribution of Dr. Visits by Diagnosis of Chronic Illness
+`r kfigr::figr("rq4ChronicHist1", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution of Dr. Visits by Diagnosis of Chronic Illness
 
 ```{r rq4ChronicHist2, include=T, echo = F, results='html'}
 rq4$plots$chronicHist2
 ```
-`r figr("rq4ChronicHist2", TRUE, type="Figure")`: Distribution of five or more Dr. Visits by Diagnosis of Chronic Illness
+`r kfigr::figr("rq4ChronicHist2", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution of five or more Dr. Visits by Diagnosis of Chronic Illness
 
 Mann-Whitney-Wilcoxon test was administered with a significance of $\alpha$ =.05 to determine whether those with a diagnosis of chronic illness visited the Dr. more frequently than those without a diagnosis. The hypotheses were as follows:
 
@@ -944,44 +966,44 @@ $H_a$ Chronic Illness has an effect on the number of Dr. Visits.
 The test indicated that those with chronic illness visited the Dr. more frequently (Mdn = `r rq4$stats$chronic$Median[1]`), than those without a diagnosis (Mdn = `r rq4$stats$chronic$Median[2]`), $U$ = `r rq4$tests$chronicTest$statistic`, $p$ < .001, $r$ = `r round(rq4$tests$chronicEffect$statistic, 3)`. 
 
 ### The Effect of Depression and Chronic Illness on the Use of Health Services
-`r figr("rq4InteractionStats", TRUE, type="Table")` reveals significant differences in mean number of Dr. visits reported by diagnosis scenario. Naturally, those with neither diagnosis reported the lowest number of Dr. visits; however, the number increased approximately `r round((mean(rq4$stats$interaction[3,8]$Mean, rq4$stats$interaction[2,8]$Mean) / rq4$stats$interaction[4,8]$Mean * 100) - 100, 1)`% for those having either a diagnosis of depression or a diagnosis of one or more chronic conditions. Those having both diagnoses visited the doctor `r round((rq4$stats$interaction[1,8]$Mean / mean(rq4$stats$interaction[3,8]$Mean, rq4$stats$interaction[2,8]$Mean) * 100) - 100, 1)`% more often than those with either a diagnosis of depression, or one or more chronic conditions.
+`r kfigr::figr("rq4InteractionStats", prefix = TRUE,  link = TRUE, type = "Table")` reveals significant differences in mean number of Dr. visits reported by diagnosis scenario. Naturally, those with neither diagnosis reported the lowest number of Dr. visits; however, the number increased approximately `r round((mean(rq4$stats$interaction[3,8]$Mean, rq4$stats$interaction[2,8]$Mean) / rq4$stats$interaction[4,8]$Mean * 100) - 100, 1)`% for those having either a diagnosis of depression or a diagnosis of one or more chronic conditions. Those having both diagnoses visited the doctor `r round((rq4$stats$interaction[1,8]$Mean / mean(rq4$stats$interaction[3,8]$Mean, rq4$stats$interaction[2,8]$Mean) * 100) - 100, 1)`% more often than those with either a diagnosis of depression, or one or more chronic conditions.
 
-`r figr("rq4InteractionStats", TRUE, type="Table")`: Descriptive Statistics of Dr. Visits by Chronic Disease and Depression Diagnoses
+`r kfigr::figr("rq4InteractionStats", prefix = TRUE,  link = TRUE, type = "Table")`: Descriptive Statistics of Dr. Visits by Chronic Disease and Depression Diagnoses
 ```{r rq4InteractionStats, echo = F, message = FALSE, warning=FALSE}
-kable(rq4$stats$interaction) %>%  
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
+knitr::kable(rq4$stats$interaction) %>%  
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
 ```
 
 
 ```{r rq4InteractionBox, include=T, echo = F, results='html'}
-grid.arrange(rq4$plots$interactionViolin, rq4$plots$interactionBox, ncol = 2, top = "Depression and Chronic Illness and Summary of Distribution of Dr. Visits")
+gridExtra::grid.arrange(rq4$plots$interactionViolin, rq4$plots$interactionBox, ncol = 2, top = "Depression and Chronic Illness and Summary of Distribution of Dr. Visits")
 ``` 
-`r figr("rq4InteractionBox", TRUE, type="Figure")`: Distribution Summary of Reports of Dr. Visits by Diagnosis of Chronic Illness & Depression
+`r kfigr::figr("rq4InteractionBox", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution Summary of Reports of Dr. Visits by Diagnosis of Chronic Illness & Depression
 
-As shown in `r figr("rq4InteractionBox", TRUE, type="Figure")` those with a diagnosis of depression, without concurrent chronic illness, visited the doctor  `r round((rq4$stats$interaction[3,8]$Mean / rq4$stats$interaction[4,8]$Mean * 100) - 100, 1)`% more frequently than those without either diagnosis. There was a slight increase of  `r round((rq4$stats$interaction[2,8]$Mean / rq4$stats$interaction[3,8]$Mean * 100) - 100, 1)`% among those with a diagnosis of chronic illness, without concurrent depression; however, those with both diagnoses visited the doctor `r round((rq4$stats$interaction[1,8]$Mean / mean(rq4$stats$interaction[2,8]$Mean, rq4$stats$interaction[2,8]$Mean) * 100) - 100, 1)`% more frequently than those with a diagnosis of depression, or chronic illness, but not both. The upper quartile increases  `r round((rq4$stats$interaction[1,10]$Upper / rq4$stats$interaction[2,10]$Upper * 100) - 100, 1)`% from `r rq4$stats$interaction[2,10]$Upper` to `r rq4$stats$interaction[1,10]$Upper` visits a month. 
+As shown in `r kfigr::figr("rq4InteractionBox", prefix = TRUE,  link = TRUE, type = "Figure")` those with a diagnosis of depression, without concurrent chronic illness, visited the doctor  `r round((rq4$stats$interaction[3,8]$Mean / rq4$stats$interaction[4,8]$Mean * 100) - 100, 1)`% more frequently than those without either diagnosis. There was a slight increase of  `r round((rq4$stats$interaction[2,8]$Mean / rq4$stats$interaction[3,8]$Mean * 100) - 100, 1)`% among those with a diagnosis of chronic illness, without concurrent depression; however, those with both diagnoses visited the doctor `r round((rq4$stats$interaction[1,8]$Mean / mean(rq4$stats$interaction[2,8]$Mean, rq4$stats$interaction[2,8]$Mean) * 100) - 100, 1)`% more frequently than those with a diagnosis of depression, or chronic illness, but not both. The upper quartile increases  `r round((rq4$stats$interaction[1,10]$Upper / rq4$stats$interaction[2,10]$Upper * 100) - 100, 1)`% from `r rq4$stats$interaction[2,10]$Upper` to `r rq4$stats$interaction[1,10]$Upper` visits a month. 
 
 ```{r rq4InteractionHist1, include=T, echo = F, results='html'}
 rq4$plots$interactionHist1
 ```
-`r figr("rq4InteractionHist1", TRUE, type="Figure")`: Distribution of Dr. Visits by Diagnosis of Chronic Illness and Depression
+`r kfigr::figr("rq4InteractionHist1", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution of Dr. Visits by Diagnosis of Chronic Illness and Depression
 
-The distribution depicted in `r figr("rq4InteractionHist1", TRUE, type="Figure")` is distorted by the heavy right skew and numbers reporting Dr. visits.  Removing the reports of zero Dr. visits from the data set reveals the shape of the distribution of reports of one or more Dr. visits.  
+The distribution depicted in `r kfigr::figr("rq4InteractionHist1", prefix = TRUE,  link = TRUE, type = "Figure")` is distorted by the heavy right skew and numbers reporting Dr. visits.  Removing the reports of zero Dr. visits from the data set reveals the shape of the distribution of reports of one or more Dr. visits.  
 
 ```{r rq4InteractionHist2, include=T, echo = F, results='html'}
 rq4$plots$interactionHist2
 ```
-`r figr("rq4InteractionHist2", TRUE, type="Figure")`: Distribution of Dr. Visits by Diagnosis of Chronic Illness and Depression
+`r kfigr::figr("rq4InteractionHist2", prefix = TRUE,  link = TRUE, type = "Figure")`: Distribution of Dr. Visits by Diagnosis of Chronic Illness and Depression
 
-The white in `r figr("rq4InteractionHist2", TRUE, type="Figure")` represents the reports of those with neither diagnosis and the dark green end of the spectrum symbolizes the reports of those with both diagnoses. The left side is dominated by light colors, representing the reports of doctors visits among those with neither diagnosis, or just one. Moving right, the graph grows darker with reports of higher numbers of doctor visits among those with one, or both diagnoses.
+The white in `r kfigr::figr("rq4InteractionHist2", prefix = TRUE,  link = TRUE, type = "Figure")` represents the reports of those with neither diagnosis and the dark green end of the spectrum symbolizes the reports of those with both diagnoses. The left side is dominated by light colors, representing the reports of doctors visits among those with neither diagnosis, or just one. Moving right, the graph grows darker with reports of higher numbers of doctor visits among those with one, or both diagnoses.
 
- `r figr("rq4InteractionPlot", TRUE, type="Figure")` illustrates how the effect of chronic illness on doctor visits varies with depression.
+ `r kfigr::figr("rq4InteractionPlot", prefix = TRUE,  link = TRUE, type = "Figure")` illustrates how the effect of chronic illness on doctor visits varies with depression.
 
 ```{r rq4InteractionPlot, include=T, echo = F, results='html'}
-  interactionPlot <- plot(allEffects(rq4$tests$interactionModel), multiline=TRUE, ci.style="bars")
+  interactionPlot <- plot(effects::allEffects(rq4$tests$interactionModel), multiline=TRUE, ci.style="bars")
 ```
-`r figr("rq4InteractionPlot", TRUE, type="Figure")`: Effect of chronic illness on user of health services, with and without concurrent depression
+`r kfigr::figr("rq4InteractionPlot", prefix = TRUE,  link = TRUE, type = "Figure")`: Effect of chronic illness on user of health services, with and without concurrent depression
 
-In `r figr("rq4InteractionPlot", TRUE, type="Figure")`, the red line indicates depression's main effect on the number of Dr. visits, without a diagnosis of chronic illness, whereby going from no to yes results in about 5 an 1/2 Dr. visits. If, however, there is a diagnosis of chronic illness, the introduction of depression almost doubles the effect on the number of Dr. visits. A Kruskal-Wallis test was conducted to confirm the interactive effects of chronic illness and depression on the use of health services. With a significance level $\alpha$ = .05, the following hypotheses were tested.  
+In `r kfigr::figr("rq4InteractionPlot", prefix = TRUE,  link = TRUE, type = "Figure")`, the red line indicates depression's main effect on the number of Dr. visits, without a diagnosis of chronic illness, whereby going from no to yes results in about 5 an 1/2 Dr. visits. If, however, there is a diagnosis of chronic illness, the introduction of depression almost doubles the effect on the number of Dr. visits. A Kruskal-Wallis test was conducted to confirm the interactive effects of chronic illness and depression on the use of health services. With a significance level $\alpha$ = .05, the following hypotheses were tested.  
 
 $H_0$ The effect of chronic illness on the use of health services is not affected by the presence of depression
 $H_a$ The effect of chronic illness on the use of health services is affected by the presence of depression
@@ -995,13 +1017,13 @@ $H_a$ There is a difference in the number of doctor visits between those without
 $H_a$ There is a difference in the number of doctor visits between those with a diagnosis of depression, without concurrent chronic illness and those with a diagnosis of chronic illness, without concurrent depression     
 $H_a$ There is a difference in the number of doctor visits between those with a diagnosis of chronic illness, without concurrent depression and those with both diagnoses     
 
-The results of the tests are summarized in `r figr("rq4Pairwise", TRUE, type="Table")`.
+The results of the tests are summarized in `r kfigr::figr("rq4Pairwise", prefix = TRUE,  link = TRUE, type = "Table")`.
 
-`r figr("rq4Pairwise", TRUE, type="Table")`: Pairwise Mann-Whitney-Wilcoxon tests of depression and chronic illness on use of health services
+`r kfigr::figr("rq4Pairwise", prefix = TRUE,  link = TRUE, type = "Table")`: Pairwise Mann-Whitney-Wilcoxon tests of depression and chronic illness on use of health services
 ```{r rq4Pairwise, echo = F, message = FALSE, warning=FALSE}
-kable(rq4$tests$pairwise) %>% 
-  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
-  add_header_above(c(" " = 1, "Group A" = 2, "Group B" = 2, " " = 6))
+knitr::kable(rq4$tests$pairwise) %>% 
+  kableExtra::kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  kableExtra::add_header_above(c(" " = 1, "Group A" = 2, "Group B" = 2, " " = 6))
 ```
 
 The differences in the effect on use of health services were significant, $X^2$ ranging from `r min(rq4$tests$pairwise$X2)` to `r max(rq4$tests$pairwise$X2)`, $p$ < .001. As hypothesized, the largest positive effect size and location parameter were between the reports from those with both diagnoses and those with only one. 
@@ -1010,7 +1032,7 @@ Which chronic diseases have the greatest impact on the use of health care servic
 ```{r rq4AllChronicPlot, include=T, echo = F, results='html'}
   rq4$plots$allChronic
 ```
-`r figr(" rq4AllChronicPlot", TRUE, type="Figure")`: Dr. visits during previous 12 months, by chronic condition
+`r kfigr::figr(" rq4AllChronicPlot", prefix = TRUE,  link = TRUE, type = "Figure")`: Dr. visits during previous 12 months, by chronic condition
 
 Of the ten chronic diseases reported, depression was second to kidney disease in reports of doctor visits. 
 

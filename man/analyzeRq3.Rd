@@ -23,5 +23,5 @@ degree does depression with co-occurring chronic illness affect productivity,
 vis-a-vis that of diagnoses of depression or chronic illness separately?
 }
 \author{
-John James, \email{jjames@dataference.com}
+John James, \email{jjames@datasciencestudio.org}
 }

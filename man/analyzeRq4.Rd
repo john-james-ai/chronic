@@ -23,5 +23,5 @@ a relationship between depression, chronic disease and the use of
 health care services?
 }
 \author{
-John James, \email{jjames@dataference.com}
+John James, \email{jjames@datasciencestudio.org}
 }

@@ -15,7 +15,7 @@
 #' Surveillance System (BRFSS) telephone survey.
 #' @return analysis List containing frequency and proportion data, plots,
 #'     and statistical tests.
-#' @author John James, \email{jjames@@dataference.com}
+#' @author John James, \email{jjames@@datasciencestudio.org}
 #' @export
 analyzeRq4 <- function(brfss) {
   #---------------------------------------------------------------------------#
@@ -24,7 +24,7 @@ analyzeRq4 <- function(brfss) {
 
   # Get complete cases for interaction analysis and create interaction variable
   interactionData <- brfss %>%
-    filter(!is.na(Visits) & !is.na(Depression) & !is.na(chronic)) %>%
+    filter(!is.na(Visits) & !is.na(Depression) & !is.na(Chronic)) %>%
     select(Visits, Depression,  Chronic)
   interactionData$DepressionChronic <-
     interaction(interactionData$Depression, interactionData$Chronic)
@@ -36,13 +36,13 @@ analyzeRq4 <- function(brfss) {
   depressionData5Plus <- depressionData %>% filter(Visits > 4)
 
   # Get chronic data
-  chronicData <- brfss %>%  filter(!is.na(Visits) & !is.na(chronic)) %>%
+  chronicData <- brfss %>%  filter(!is.na(Visits) & !is.na(Chronic)) %>%
     select(Visits, Chronic)
   chronicData5Plus <- chronicData %>% filter(Visits > 4)
 
   # Get data for all chronic disease, including depression
   allChronicData <- brfss %>%  filter(!is.na(Visits) & Depression == 'No' &
-                                        !is.na('Heart Attack') & !is.na(chronic) &
+                                        !is.na('Heart Attack') & !is.na(Chronic) &
                                         Chronic == 'Yes' &
                                         !is.na('Angina Or Coronary Heart Disease') &
                                         !is.na(Stroke) & !is.na(Asthma) &
@@ -102,21 +102,21 @@ analyzeRq4 <- function(brfss) {
   values <- list('Yes', 'No')
 
   depressionStats <-
-    rbindlist(lapply(seq_along(values), function(x) {
+    data.table::rbindlist(lapply(seq_along(values), function(x) {
     getStats(depressionData %>% filter(Depression == values[[x]])
              %>% select(Visits), 'Visits', 'Depression', values[[x]])
     }))
 
 
   chronicStats <-
-    rbindlist(lapply(seq_along(values), function(x) {
-      getStats(chronicData %>% filter(chronic == values[[x]])
+    data.table::rbindlist(lapply(seq_along(values), function(x) {
+      getStats(chronicData %>% filter(Chronic == values[[x]])
                %>% select(Visits), 'Visits', 'Chronic', values[[x]])
     }))
 
   values <- list('Yes.Yes', 'No.Yes', 'Yes.No', 'No.No')
   interactionStats <-
-    rbindlist(lapply(seq_along(values), function(x) {
+    data.table::rbindlist(lapply(seq_along(values), function(x) {
       getStats(interactionData %>% filter(DepressionChronic == values[[x]])
                %>% select(Visits), 'Visits', 'DepressionChronic', values[[x]])
     }))
@@ -156,7 +156,7 @@ analyzeRq4 <- function(brfss) {
                           ggplot2::aes(x = Depression, y = Visits, fill = Depression)) +
     ggplot2::geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
     ggplot2::labs(fill = 'Depression') +
-    ylab('Dr. Visits') +
+    ggplot2::ylab('Dr. Visits') +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_brewer(palette = 'Greens', direction = -1) +
     ggplot2::theme(text = ggplot2::element_text(family="Open Sans"),
@@ -171,7 +171,7 @@ analyzeRq4 <- function(brfss) {
                              ggplot2::aes(x = Depression, y = Visits, fill = Depression)) +
     ggplot2::geom_boxplot() +
     ggplot2::labs(fill = 'Depression') +
-    ylab('Dr. Visits') +
+    ggplot2::ylab('Dr. Visits') +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_brewer(palette = 'Greens', direction = -1) +
     ggplot2::theme(text = ggplot2::element_text(family="Open Sans"),
@@ -212,7 +212,7 @@ analyzeRq4 <- function(brfss) {
                        ggplot2::aes(x = Chronic, y = Visits, fill = Chronic)) +
     ggplot2::geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
     ggplot2::labs(fill = 'Chronic Illness') +
-    ylab('Dr. Visits') +
+    ggplot2::ylab('Dr. Visits') +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_brewer(palette = 'Greens', direction = -1) +
     ggplot2::theme(text = ggplot2::element_text(family="Open Sans"),
@@ -226,7 +226,7 @@ analyzeRq4 <- function(brfss) {
                           ggplot2::aes(x = Chronic, y = Visits, fill = Chronic)) +
     ggplot2::geom_boxplot() +
     ggplot2::labs(fill = 'Chronic Illness') +
-    ylab('Dr. Visits') +
+    ggplot2::ylab('Dr. Visits') +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_brewer(palette = 'Greens', direction = -1) +
     ggplot2::theme(text = ggplot2::element_text(family="Open Sans"),
@@ -298,7 +298,7 @@ analyzeRq4 <- function(brfss) {
          y = 'Dr. Visits') +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_brewer(palette = 'Greens', direction = -1) +
-    stat_summary(fun.y = mean, geom = 'point') +
+    ggplot2::stat_summary(fun.y = mean, geom = 'point') +
     ggplot2::theme(text = ggplot2::element_text(family="Open Sans"),
           axis.title.x = ggplot2::element_blank(),
           axis.text.x = ggplot2::element_blank(),
@@ -315,7 +315,7 @@ analyzeRq4 <- function(brfss) {
          y = 'Dr. Visits') +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_brewer(palette = 'Greens', direction = -1) +
-    stat_summary(fun.y = mean, geom = 'point') +
+    ggplot2::stat_summary(fun.y = mean, geom = 'point') +
     ggplot2::theme(text = ggplot2::element_text(family="Open Sans"),
           axis.title.x = ggplot2::element_blank(),
           axis.text.x = ggplot2::element_blank(),
@@ -359,8 +359,8 @@ analyzeRq4 <- function(brfss) {
   # Conduct Wilcox and effect tests for chronic illness on Dr. Visits
   chronicTest <- wilcox.test(Visits ~ Chronic, data = chronicData,
                              conf.int = TRUE)
-  yesGroup <- chronicData %>% filter(chronic == 'Yes')
-  noGroup <- chronicData %>% filter(chronic == 'No')
+  yesGroup <- chronicData %>% filter(Chronic == 'Yes')
+  noGroup <- chronicData %>% filter(Chronic == 'No')
   chronicEffect <- ks.test(yesGroup$Visits, noGroup$Visits)
 
   # Conduct Kruskal and effect tests for depression n& chronic illness on Dr. Visits

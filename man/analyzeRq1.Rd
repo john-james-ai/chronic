@@ -22,5 +22,5 @@ Function that performs the analysis for research question #1:  Is there an
 association between education and income and the prevalence of depression?
 }
 \author{
-John James, \email{jjames@dataference.com}
+John James, \email{jjames@datasciencestudio.org}
 }

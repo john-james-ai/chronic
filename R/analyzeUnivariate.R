@@ -10,7 +10,7 @@
 #'
 #' @param brfss Data frame of preprocessed 2013 Behavioral Risk Factor Surveillance System (BRFSS) data
 #' @return univariate List of analyses for categorical and quantitative variables
-#' @author John James, \email{jjames@@dataference.com}
+#' @author John James, \email{jjames@@datasciencestudio.org}
 #' @export
 analyzeUnivariate <- function(brfss) {
 
@@ -70,14 +70,12 @@ analyzeUnivariate <- function(brfss) {
 
     return(analysis)
   }
-  ## ---- end
 
-  ## ---- analyze_chronic
   analyzeChronic <- function(brfss) {
 
     # Table
-    chronic <- data.table::as.data.table(brfss %>% group_by(Chronic) %>% dplyr::summarize(N=as.numeric(n())) %>%
-      mutate(Pct = round(N / sum(N) * 100, 1), Cumulative = round(cumsum(Pct), 1)))
+    chronic <- brfss %>% group_by(Chronic) %>% dplyr::summarize(N=as.numeric(n())) %>%
+      mutate(Pct = round(N / sum(N) * 100, 1), Cumulative = round(cumsum(Pct), 1))
 
     # Summarize Variable
     levels <- dplyr::count(unique(chronic %>%
@@ -128,9 +126,7 @@ analyzeUnivariate <- function(brfss) {
 
     return(analysis)
   }
-  ## ---- end
 
-  ## ---- analyze_income
   analyzeIncome <- function(brfss) {
 
     # Frequency Distribution Table
@@ -240,10 +236,6 @@ analyzeUnivariate <- function(brfss) {
 
   }
 
-  ## ---- end
-
-
-  ## ---- analyze_bad_days_range
   analyzeSickDaysRange <- function(brfss) {
 
     # Frequency Distribution Table
@@ -299,10 +291,6 @@ analyzeUnivariate <- function(brfss) {
 
   }
 
-  ## ---- end
-
-
-  ## ---- analyze_bad_days
   analyzeSickDays <- function(brfss) {
 
     # Extracted valid values
@@ -381,10 +369,7 @@ analyzeUnivariate <- function(brfss) {
     return(analysis)
 
   }
-  ## ---- end
 
-
-  ## ---- analyze_visits
   analyzeVisits <- function(brfss) {
 
     # Extract valid data for plotting

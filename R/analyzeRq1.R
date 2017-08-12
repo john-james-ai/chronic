@@ -13,7 +13,7 @@
 #' Surveillance System (BRFSS) telephone survey.
 #' @return analysis List containing frequency and proportion data, plots,
 #'     and statistical tests.
-#' @author John James, \email{jjames@@dataference.com}
+#' @author John James, \email{jjames@@datasciencestudio.org}
 #' @export
 analyzeRq1 <- function(brfss) {
 
@@ -209,7 +209,7 @@ analyzeRq1 <- function(brfss) {
               colour="black", family="Tahoma", size=4) +
     ggplot2::theme(text=ggplot2::element_text(family="Open Sans"), legend.position = "bottom") +
     ggplot2::scale_fill_brewer(palette="Greens") +
-    ggplot2::scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
+    ggplot2::scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 10)) +
     ggplot2::labs(x = "Income",  y = 'Count') +
     ggplot2::ggtitle('Frequency Distribution')
 
@@ -222,7 +222,7 @@ analyzeRq1 <- function(brfss) {
               colour="black", family="Tahoma", size=4) +
     ggplot2::theme(text=ggplot2::element_text(family="Open Sans"), legend.position = "bottom") +
     ggplot2::scale_fill_brewer(palette="Greens") +
-    ggplot2::scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
+    ggplot2::scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 10)) +
     ggplot2::labs(x = "Income",  y = 'Proportion') +
     ggplot2::ggtitle('Proportional Distribution')
 
@@ -234,7 +234,7 @@ analyzeRq1 <- function(brfss) {
               colour="black", family="Tahoma", size=4) +
     ggplot2::theme(text=ggplot2::element_text(family="Open Sans"), legend.position = "bottom") +
     ggplot2::scale_fill_brewer(palette="Greens") +
-    ggplot2::scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
+    ggplot2::scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 10)) +
     ggplot2::labs(x = "Education",  y = 'Count') +
     ggplot2::ggtitle('Frequency Distribution')
 
@@ -246,7 +246,7 @@ analyzeRq1 <- function(brfss) {
               colour="black", family="Tahoma", size=4) +
     ggplot2::theme(text=ggplot2::element_text(family="Open Sans"), legend.position = "bottom") +
     ggplot2::scale_fill_brewer(palette="Greens") +
-    ggplot2::scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
+    ggplot2::scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 10)) +
     ggplot2::labs(x = "Education",  y = 'Proportion') +
     ggplot2::ggtitle('Proportional Distribution')
 
@@ -263,7 +263,7 @@ analyzeRq1 <- function(brfss) {
             axis.text.x = ggplot2::element_text(size = 8),
             axis.title.x = ggplot2::element_blank()) +
       ggplot2::scale_fill_brewer(palette="Greens") +
-      ggplot2::scale_x_discrete(labels = function(x) str_wrap(x, width = 4)) +
+      ggplot2::scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 4)) +
       ggplot2::labs(title = education,
            y = 'Proportion')
     return(bar)

@@ -14,7 +14,7 @@
 #' Surveillance System (BRFSS) telephone survey.
 #' @return analysis List containing frequency and proportion data, plots,
 #'     and statistical tests.
-#' @author John James, \email{jjames@@dataference.com}
+#' @author John James, \email{jjames@@datasciencestudio.org}
 #' @export
 analyzeRq3 <- function(brfss) {
   #---------------------------------------------------------------------------#
@@ -22,7 +22,7 @@ analyzeRq3 <- function(brfss) {
   #---------------------------------------------------------------------------#
   # Get complete cases for interaction analysis and create interaction variable
   interactionData <- brfss %>%
-    filter(!is.na(SickDays) & !is.na(Depression) & !is.na(chronic) & SickDays < 32) %>%
+    filter(!is.na(SickDays) & !is.na(Depression) & !is.na(Chronic) & SickDays < 32) %>%
     select(SickDays, Depression,  Chronic, SickDaysInd)
 
   interactionData$DepressionChronic <-
@@ -37,14 +37,14 @@ analyzeRq3 <- function(brfss) {
 
   # Get chronic data
   chronicData <- brfss %>%  filter(!is.na(SickDays) &
-                                   !is.na(chronic) & SickDays < 32) %>%
+                                   !is.na(Chronic) & SickDays < 32) %>%
     select(SickDays, Chronic, SickDaysInd)
   chronicDataPhd <- chronicData %>% filter(SickDays > 0)
 
   # Get data for all chronic disease, including depression
   allChronicData <- brfss %>%  filter(!is.na(SickDays) & Depression == 'No' &
                                         SickDays < 32 &
-                                        !is.na('Heart Attack') & !is.na(chronic) &
+                                        !is.na('Heart Attack') & !is.na(Chronic) &
                                         Chronic == 'Yes' &
                                         !is.na('Angina Or Coronary Heart Disease') &
                                         !is.na(Stroke) & !is.na(Asthma) &
@@ -71,7 +71,6 @@ analyzeRq3 <- function(brfss) {
                                                    desc(SickDaysInd)) %>%
     group_by(Depression) %>%
     mutate(cumFreq = cumsum(Freq), pos = cumFreq - 0.5 * Freq)
-
   # Format 2-Way Depression Marginal Proportion Contingency Tables for plotting
   depressionPropDf <- depressionPropDf %>% arrange(Depression,
                                                    desc(SickDaysInd)) %>%
@@ -86,22 +85,21 @@ analyzeRq3 <- function(brfss) {
   # Create Tables for Analysis of Effect of Chronic Illness on Productivity   #
   #---------------------------------------------------------------------------#
   # Create 2-Way Marginal Contingency Tables on Chronic Ilness and Sick Days
-  chronicTbl <- with(chronicData, table(chronic, SickDaysInd))
+  chronicTbl <- with(chronicData, table(Chronic, SickDaysInd))
   chronicFreqTbl <- ftable(chronicTbl)
   chronicFreqDf <- as.data.frame(chronicFreqTbl)
   chronicPropTbl <- ftable(prop.table(chronicTbl, 1))
   chronicPropDf <- as.data.frame(chronicPropTbl)
-
   # Format 2-Way Chronic Marginal Frequency Contingency Tables for plotting
-  chronicFreqDf <- chronicFreqDf %>% arrange(chronic,
+  chronicFreqDf <- chronicFreqDf %>% arrange(Chronic,
                                              desc(SickDaysInd)) %>%
-    group_by(chronic) %>%
+    group_by(Chronic) %>%
     mutate(cumFreq = cumsum(Freq), pos = cumFreq - 0.5 * Freq)
 
   # Format 2-Way Chronic Marginal Proportional Contingency Tables for plotting
-  chronicPropDf <- chronicPropDf %>% arrange(chronic,
+  chronicPropDf <- chronicPropDf %>% arrange(Chronic,
                                              desc(SickDaysInd)) %>%
-    group_by(chronic) %>%
+    group_by(Chronic) %>%
     mutate(pct = round(Freq * 100, 0), cumPct = cumsum(pct),
            pos = cumPct - 0.5 * pct)
 
@@ -179,14 +177,14 @@ analyzeRq3 <- function(brfss) {
   values <- list('Yes', 'No')
 
   depressionStats <-
-    rbindlist(lapply(seq_along(values), function(x) {
+    data.table::rbindlist(lapply(seq_along(values), function(x) {
     getStats(depressionData %>% filter(Depression == values[[x]])
              %>% select(SickDays), 'SickDays', 'Depression', values[[x]])
     }))
 
   chronicStats <-
-    rbindlist(lapply(seq_along(values), function(x) {
-      getStats(chronicData %>% filter(chronic == values[[x]])
+    data.table::rbindlist(lapply(seq_along(values), function(x) {
+      getStats(chronicData %>% filter(Chronic == values[[x]])
                %>% select(SickDays), 'SickDays', 'Chronic', values[[x]])
     }))
 
@@ -220,7 +218,7 @@ analyzeRq3 <- function(brfss) {
 
   values <- list('Yes.Yes', 'No.Yes', 'Yes.No', 'No.No')
   interactionStats <-
-    rbindlist(lapply(seq_along(values), function(x) {
+    data.table::rbindlist(lapply(seq_along(values), function(x) {
       getStats(interactionData %>% filter(DepressionChronic == values[[x]])
                %>% select(SickDays), 'SickDays', 'DepressionChronic', values[[x]])
     }))
@@ -266,7 +264,7 @@ analyzeRq3 <- function(brfss) {
                           ggplot2::aes(x = Depression, y = SickDays, fill = Depression)) +
     ggplot2::geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
     ggplot2::labs(title = 'Violin Plot',fill = 'Depression') +
-    ylab('Sick Days') +
+    ggplot2::ylab('Sick Days') +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_brewer(palette = 'Greens', direction = -1) +
     ggplot2::theme(text = ggplot2::element_text(family="Open Sans"),
@@ -281,7 +279,7 @@ analyzeRq3 <- function(brfss) {
                              ggplot2::aes(x = Depression, y = SickDays, fill = Depression)) +
     ggplot2::geom_boxplot() +
     ggplot2::labs(title = 'Box Plot', fill = 'Depression') +
-    ylab('Sick Days') +
+    ggplot2::ylab('Sick Days') +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_brewer(palette = 'Greens', direction = -1) +
     ggplot2::theme(text = ggplot2::element_text(family="Open Sans"),
@@ -354,7 +352,7 @@ analyzeRq3 <- function(brfss) {
                        ggplot2::aes(x = Chronic, y = SickDays, fill = Chronic)) +
     ggplot2::geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
     ggplot2::labs(title = 'Violin Plot', fill = 'Chronic Illness') +
-    ylab('Sick Days') +
+    ggplot2::ylab('Sick Days') +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_brewer(palette = 'Greens', direction = -1) +
     ggplot2::theme(text = ggplot2::element_text(family="Open Sans"),
@@ -368,7 +366,7 @@ analyzeRq3 <- function(brfss) {
                           ggplot2::aes(x = Chronic, y = SickDays, fill = Chronic)) +
     ggplot2::geom_boxplot() +
     ggplot2::labs(title = 'Box Plot', fill = 'Chronic Illness') +
-    ylab('Sick Days') +
+    ggplot2::ylab('Sick Days') +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_brewer(palette = 'Greens', direction = -1) +
     ggplot2::theme(text = ggplot2::element_text(family="Open Sans"),
@@ -471,7 +469,7 @@ analyzeRq3 <- function(brfss) {
          y = 'Sick Days') +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_brewer(palette = 'Greens', direction = -1) +
-    stat_summary(fun.y = mean, geom = 'point') +
+    ggplot2::stat_summary(fun.y = mean, geom = 'point') +
     ggplot2::theme(text = ggplot2::element_text(family="Open Sans"),
           axis.title.x = ggplot2::element_blank(),
           axis.text.x = ggplot2::element_blank(),
@@ -487,7 +485,7 @@ analyzeRq3 <- function(brfss) {
          y = 'Sick Days') +
     ggplot2::theme_minimal() +
     ggplot2::scale_fill_brewer(palette = 'Greens', direction = -1) +
-    stat_summary(fun.y = mean, geom = 'point') +
+    ggplot2::stat_summary(fun.y = mean, geom = 'point') +
     ggplot2::theme(text = ggplot2::element_text(family="Open Sans"),
           axis.title.x = ggplot2::element_blank(),
           axis.text.x = ggplot2::element_blank(),
@@ -530,8 +528,8 @@ analyzeRq3 <- function(brfss) {
   # Conduct Wilcox and effect tests for chronic illness on sick days
   chronicTest <- wilcox.test(SickDays ~ Chronic, data = chronicData,
                              conf.int = TRUE)
-  yesGroup <- chronicData %>% filter(chronic == 'Yes')
-  noGroup <- chronicData %>% filter(chronic == 'No')
+  yesGroup <- chronicData %>% filter(Chronic == 'Yes')
+  noGroup <- chronicData %>% filter(Chronic == 'No')
   chronicEffect <- ks.test(yesGroup$SickDays, noGroup$SickDays)
 
   # Conduct Kruskal and effect tests for depression n& chronic illness on sick days

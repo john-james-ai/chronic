@@ -9,7 +9,7 @@
 #'
 #' @param brfss Data frame of 2013 Behavioral Risk Factor Surveillance System (BRFSS) data
 #' @return brfss Data frame containing variables required for downstream analysis
-#' @author John James, \email{jjames@@dataference.com}
+#' @author John James, \email{jjames@@datasciencestudio.org}
 #' @export
 preProcessData <- function(brfss) {
 

@@ -29,5 +29,5 @@ of 0.1, with the p<.05 probability of a type I error of p < .05
 and power of 0.8
 }
 \author{
-John James, \email{jjames@dataference.com}
+John James, \email{jjames@datasciencestudio.org}
 }
