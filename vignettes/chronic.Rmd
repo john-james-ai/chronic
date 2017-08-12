@@ -1,0 +1,1040 @@
+---
+title: "Chronic Illness and Depression: Prevalence Comorbidity & Costs"
+author: "John James"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output:
+  rmdformats::readthedown:
+    highlight: kate
+    css: rmdStyles.css
+bibliography: Health.bib
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r knitr_init, echo=FALSE, cache=FALSE, warning=FALSE, message=FALSE}
+options(knitr.table.format = "html")
+options(max.print="75", scipen=999, width = 800)
+knitr::opts_chunk$set(echo=FALSE,
+	             cache=FALSE,
+               prompt=FALSE,
+               tidy=TRUE,
+               root.dir = "..",
+               fig.height = 4,
+               fig.width = 10,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE)
+knitr::opts_knit$set(width=100, kfigr.prefix = T, kfigr.link = T)
+knitr::knit_hooks$set(inline = function(x) {
+  prettyNum(x, big.mark=",")
+})
+```
+
+```{r loadData, cache=TRUE}
+load("../data/brfss2013.RData")
+```
+
+```{r preprocessData, echo = F, include=T,  results='html'}
+brfss <- preProcessData(brfss2013)
+```   
+
+```{r univariateAnalysis, echo = F}
+univariate <- analyzeUnivariate(brfss)
+``` 
+
+```{r analyzeRq1, echo = F}
+rq1 <- analyzeRq1(brfss)
+``` 
+
+```{r rq2, include=T, echo = F, results='asis'}
+rq2 <- analyzeRq2(brfss)
+``` 
+
+```{r analyzeRq3, echo = F}
+rq3 <- analyzeRq3(brfss)
+``` 
+
+```{r analyzeRq4, echo = F}
+rq4 <- analyzeRq4(brfss)
+``` 
+
+# Abstract
+Depression, studies have shown, costs society $210 billion per year in direct and indirect medical expenditures and lost productivity. In fact, research has indicated that the productive years lost to disability from depression are three times greater than from those to diabetes, eight times greater than those from heart disease, and 40 times those to cancer. Furthermore, patients suffering from chronic illness with co-occurring depression may incur upwards of 50% to 100% greater use in of health care services and costs. This analysis explores the sociodemographics of depression, its co-occurrence with chronic illness, and the marginal, conditional and joint effects of depression and chronic disease on productivity and the use of health care services.  
+
+The Center for Disease Control's 2013 Behavioral Risk Factor Surveillance System (BRFSS) telephone survey provided the data for this analysis. This state-based, chross-sectional study compiled health, chronic disease, quality of life, behavioral risk factor and use of health service information from nearly 500,000 Americans. The data was statistically investigated to address four fundamental questions: (1) is there a relationship between socioeconomic status depression, (2) to what degree does depression co-occur with other chronic conditions such as heart disease, diabetes, asthma, kidney disease, asthma and other lung diseases, (3) what are the marginal, conditional, and joint effects of depression on productivity vis-a-vis those of chronic illness and (4) how does depression affect the use of health care services for those with and without chronic disorders.
+
+Considering the sociodemographics, depression occurred with greater prevalence among those at the lower income strata; however, the highest rates of depression, controlling for education, were among college graduates across all income levels. With regard to comorbidity, 73% of those with chronic dysfunction also reported a prior diagnosis of depression. The effect on productivity was significant; indeed, those with depression with chronic illness had `r round((rq3$stats$interaction[1,8]$Mean / rq3$stats$chronic[1,8]$Mean * 100) - 100, 1)` greater loss in productivity than those with one or more non-mental chronic disorders. Lastly, those suffering from comorbid depression and chronic illness had `r round((rq3$stats$interaction[1,8]$Mean / mean(rq3$stats$interaction[2,8]$Mean,rq3$stats$interaction[3,8]$Mean) * 100) - 100,1)`% higher use of health care services than those reporting one or several chronic diseases, second only to Kidney disease in the number of office visits during the 12 month period preceding the survey.
+
+Though these findings were significant, further time-based studies which evaluate multiple interventions would be required to illuminate the direction, strength, and nature of any cause-effect relationships among sociodemographic, productivity, and cost factors. 
+
+Notwithstanding, this analysis has shown depression to be the most debilitating of the chronic disorders, with significant productivity effects and personal and societal costs. 
+
+# Introduction
+## Background Information
+Depression in America costs society $210 billion per year in direct and indirect medical expenditures and lost productivity [@Greenberg2015]. In fact, productive years lost to disability from depression are three times greater than from diabetes, eight times more than from heart disease, and 40 times that of cancer [@Lim2012]. Causing persistent (two weeks or longer) feelings of sadness and loss of interest in activities once enjoyed, feelings of worthlessness or guilt, difficulty thinking, concentrating, or decision making, and thoughts of death or suicide [@AmericanPsychiatricAssociation2017], depression afflicts more than 18% [@Bekiempis2014a] of Americans.  Over 16 million adults aged 18 or older (6.7% of all U.S. adults) had at least one major depressive episode during 2015 [@CenterforBehavioralHealthStatisticsandQuality2016]. According to the World Health Organization, depression is **the** leading cause of disability worldwide [@WHO2012] and carries the heaviest burden of disability among adults age 15 to 44 in the United States [@Health2010]. 
+
+Notwithstanding, the economic burden of chronic disease, the leading cause of death and disability in America, tops \$1.3 trillion annually in lost productivity and treatment costs [@Devol2007]. Whereas, sixty percent of Americans, according to a 2014 report, had at least one chronic disease, 42% of U.S. citizens suffered from several chronic conditions [@Buttorff2017] and the treatment costs are substantial. Health care spending for chronic illnesses, such as coronary heart disease, stroke, asthma, cancer, chronic obstructive pulmonary disease (COPD), kidney disease, diabetes and mental disorders, is \$1.65 trillion per annum, 75% of overall health care spending.
+
+Hypothesized to have a greater prevalence among the lower social-economic strata, depression often co-occurs with other chronic diseases and is consistently associated with increased overall burden of illness in patients. Indeed, patients suffering from chronic diseases with co-occurring depression can have a 50% to 100% increase in overall health services use and costs [@Simon2003].  
+
+This analysis explores the socioeconomics of depression, its relationship with chronic illness, and the marginal and joint effects of depression and chronic illness on productivity and the use of health care services.  Capturing the health conditions, behavioral risk factors, quality of life and use of preventative services for nearly 500,000 Americans, the Center for Disease Control's 2013 state-based, monthly cross-sectional Behavioral Risk Factor Surveillance System (BRFSS) telephone survey served as the data source for this analysis.   
+
+## Research Questions
+Four research questions were devised to examine the socioeconomics of depression, the relationship between depression and chronic illness and their marginal and joint effects on productivity and the use of health care services. 
+
+### Research Question #1: Socioeconomic Factors
+The first research question assessed the relationship between depressive disorder and socioeconomic status as measured by educational achievement and income.
+
+> Is there an association between education and income and the prevalence of depression?
+
+A diagnosis of depression was the response variable, and education level completed and income level achieved were the explanatory variables.
+
+### Research Question #2: Co-occurrence of Depression and Chronic Illness
+This research question examined the degree of co-occurrence of depression and chronic illness.
+
+> Is there a relationship between depression and chronic illness?
+
+The response variable was the diagnosis of depression and the diagnosis of a chronic illness explanatory variable, which was set to  "Yes" if any of the following variables were set to "Yes."
+
+`r figr("chronic", TRUE, type="Table")`: Chronic conditions evaluated in this study
+```{r chronic, echo = F, message = FALSE, warning=FALSE}
+kable(chronic) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
+```
+
+### Research Question #3: Depression, Chronic Illness and Loss of Productivity 
+The literature associates both depression and chronic disease with significant loss of productivity. This research question examined the marginal and joint effects of depression and chronic illness on productivity.
+
+> To what degree does depression with co-occurring chronic illness affect productivity, vis-a-vis that of diagnoses of depression or chronic illness separately?
+
+The response variable was the number of sick days over the 30 days preceding the survey, and the explanatory variables were a diagnosis of depression and a diagnosis of one or more chronic conditions. 
+
+### Research Question #4: Chronic Illness, Depression and Costs
+Co morbidity of depression and chronic disease is associated with significantly higher usage of health care services.  This research question examined the marginal and joint effects of depression and chronic illness on the use of health care services.
+
+> Is there a relationship between depression, chronic disease and the use of health care services?
+
+The response variable was the number of Dr. visits during the 12 months preceding the survey.  The explanatory variables were the diagnoses of depression and chronic illness.
+
+## Document Organization
+The methods section describes the data, its collection process, sampling techniques and data preprocessing as well as the univariate and multivariate analyses for each research question. The results section summarizes the descriptive and analytical statistics. The discussion section describes the significance of the findings vis-a-vis currently available research.  Lastly, the conclusion synthesizes the key points.
+
+# Methods
+## Data
+The analysis used survey data obtained from the 2013 Behavioral Risk Factor Surveillance System (BRFSS), a state-based, monthly cross-sectional telephone survey, conducted with technical and methodological assistance from the Centers for Disease Control and Prevention (CDC). The study queried U.S. residents regarding their health-related risk behaviors, chronic health conditions, and use of preventive services. Comprised of over 490,000 responses from all 50 states, the District of Columbia, Guam and Puerto Rico, the BRFSS data captured over 300 factors such as tobacco use, HIV/AIDS knowledge and prevention, exercise, immunization, and health status. The compendium recorded sick days, health-related quality of life, health care access, inadequate sleep, hypertension awareness, cholesterol awareness, chronic health conditions, alcohol use, fruit and vegetable consumption, arthritis burden, and seat-belt use.   
+
+### Data Sampling
+Disproportionate stratified sampling (DSS) was used to ensure that the selection of respondents was representative of the population of non-institutionalized adult U.S. residents age 18 and older. The CDC sampled from two landline telephone number strata which were based upon the presumed density of known telephone household numbers in the sample; the high-density landline strata were sampled at a higher rate. The researchers randomly selected mobile phone numbers from a collection of confirmed mobile phone area code and prefix combinations. Next, the investigators randomly chose respondents from each stratum with equal probability of selection. The CDC provided separate phone samples for each state based upon the target number of completed surveys for that state that year. As such, the data and observations could be considered **generalizable** to the population of adults age 18 and older, living in the U.S. Causation, on the other hand, could not be inferred as there was no random assignment of participants to control and experimental groups.
+
+### Data Sampling Bias
+Elements of the survey sampling protocol were designed to mitigate *noncoverage bias*, *nonresponse bias* and *response biases*. Weighting protocols were used to adjust for nonresponse bias and to assure representativeness across population characteristics such as education level, marital status, and home ownership. **Stratum weights** accounted for differences in the probability of selection among strata. The **design weight** was the product of the stratum weight and the inverse of the number of telephones in the household. Finally **raking** adjusted the design weight according to age group by gender, race/ethnicity, education, marital status, tenure, gender by race/ethnicity, age group by race/ethnicity and phone ownership. Recent adjustments to the protocol have been made to account for the increasing number of adults with only mobile phones. 
+
+However, *selection bias*, *partial-response bias* and *social desirability bias* may have manifested. Selection bias may result as a consequence of the telephone number selection process. The increased use of mobile phones and the sociodemographics characteristics of telephone listing could have disproportionately favored certain social-economic, age or ethnic groups. The generalizability could have been affected by partial response bias. For instance, the poor health variable had a response rate of slightly over 50%. Partial response bias may have reduced available sample size, reduced power, and lead to type II errors. Social desirability may have been extant in higher than actual levels of education or income, or a reluctance on behalf of the respondent to admit to certain unhealthful behaviors or activities. Instead, his or her responses may have been biased towards attitudes, beliefs, habits, and behaviors believed to be socially desirable.
+
+### Data Questionnaire
+The BRFSS questionnaire, designed by a working group of BRFSS state coordinators and CDC staff and approved by all state coordinators, had three parts: 1) the core component, consisting of the fixed core, rotating core, and emerging core, 2) optional modules, and 3) state-added questions. The core component questions were mandatory, but the modules were optional. The fixed core, a standard set of questions regarding demographics and current health behaviors, were asked by all states. The rotating core, made up of two distinct sets of questions, each set used in alternating years by all states, addressed different topics. In the years the rotating core topics were not used, they were offered as optional modules. The emerging core, a set of up to five questions typically focused on "late -breaking" issues, was added to the fixed and rotating cores.
+
+### Data Collection
+States conducted telephone interviews during daytime and evening hours, seven days per week, during each calendar month.  The core portion of the interview lasted approximately 18 minutes, and the state modules added another 5-10 minutes to the interview. 
+
+### Data Variables
+The following table lists the variables used as well as any "derived" variables created for the analysis.
+
+`r figr("variables", TRUE, type="Table")`: BRFSS variables used in the study
+```{r variables, echo = F, message = FALSE, warning=FALSE}
+kable(variables) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
+```
+
+### Data Preprocessing
+After reducing the data set from 330 variables to 15, two new variables were coded. The dichotomous 'Chronic' variable indicated a diagnosis of one or more chronic conditions. The dichotomous 'SickDaysInd' variable indicated that one or more sick days were reported.
+
+### Power Analysis 
+Variable and partial response rates may have affected sample size. To ensure that readers could rely upon non-significant results, this analyst conducted several power analyses using the pwr package [@Ekstrom2017]. Each test indicated the minimum sample size required to detect a small effect of 0.1, with the $p < .05$ probability of a type I error of p < .05 and power of 0.8. `r figr("power", TRUE, type="Table")` summarizes the minimum required sample size ($N$) for each type of statistical test to be conducted.
+
+`r figr("power", TRUE, type="Table")`: Sample Size Estimates from Power Analysis
+```{r power, include=T, echo = F, results='html'}
+power <- estimateSampleSize()
+kable(power, digits = 2) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = T, position = "center")
+``` 
+
+## Data Analysis
+The study involved both descriptive and inferential statistics. 
+
+### Descriptive Statistics 
+The study began with a univariate analysis of the sample variables of interest.  For the categorical variables, response rates, proportions and frequency counts were calculated and presented in tables and bar plots. Population proportions were estimated using one-proportion z-tests. For quantitative variables, ranges, medians, means, modes, quartiles, skewness, kurtosis, standard deviations, standard errors and extreme values were obtained and presented in tables, box plots, and histograms/density plots.
+
+### Inferential Statistics
+One-proportion z-tests were conducted to ascertain the differences between observed rates of depression and chronic illness, and the hypothesized rates from literature. The marginal associations between income and education and the prevalence of depression and the association between depression and chronic illness diagnoses were evaluated using chi-squared equality of proportions tests. The Cochran-Mantel Haenszel test evaluated the conditional association of income on depression, controlling for education. Since the quantitative variables departed significantly from normality, non-parametric Mann-Whitney-Wilcoxon tests [@Mann] and Kruskal-Wallis [@Kruskal1952] tests were administered to determine the marginal and joint effects of depression and chronic illness on the mean number of sick days and Dr. visits reported. Odds ratios indicated the strength of association between categorical variables.  Association tests using the Cramer's V statistic were administered to measure the effect sizes on categorical response variables. The Cramer's D statistic, provided by the Kolmogorov-Smirnov test, estimated effect sizes on quantitative variables. The $\alpha$ significance level was uniformly set to .05 for all statistical tests. `r figr("inferentials", TRUE, type="Table")` summarizes the inferential techniques employed in this analysis. 
+
+`r figr("inferentials", TRUE, type="Table")`: Inferential Techniques
+```{r inferentials, echo = F, message = FALSE, warning=FALSE}
+kable(inferential[,1:7]) %>%  add_header_above(c(" ", " ", "Research Question" = 4, " ")) %>%
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
+```
+
+
+## System and Environment
+This analysis was implemented using the 64 bit version of the R Programming Language, version 3.3.1. [@TheRFoundation2015] within the R. Studio Version 0.99.903 [@RStudioTeam2016] development environment on a Windows x64-based laptop powered by an Intel Core i7-3610QM CPU @ 2.30GHz, 2301 MHz processor with 4 Cores, 8 Logical Processors, and 16.0 GB of installed memory, running the Microsoft Windows 10 Home operating system, version	10.0.14393 Build 14393. Report writing and generation packages included knitr [@Xie2013], printr [@Yihui2017], and kfigr [@Koohafkan2015].  Data management functionality was provided by the dplyr [Wickham2015a], reshape2 [@Rcpp2016], xtable [@Dahl2016] and data table [@Dowle2016] packages. Graphics and data visualization were powered by the ggplot2 [@Wickham2016], gridExtra [@BaptisteAuguie2016], the stargazer [@Hlavac2015], vcd [@Meyer2013], and effects [@Fox2009] packages. Additional statistical packages included modeest [@Ponset] and pwr [@Ekstrom2017].
+
+# Results
+The socioeconomics of depression, the relationship between depression and the occurrence of one or more chronic conditions, and the marginal and joint effects of depression and chronic illness on productivity and the use of health care services are addressed here via the following four questions: 
+
+1. Is there an association between education and income and the prevalence of depression?
+2. Is there a relationship between depression and chronic illness?
+3. Is there a relationship between depression and chronic disease and productivity?
+4. Is there a relationship between depression and chronic conditions and the use of health care services?
+
+The rest of this section begins with a univariate analysis of the categorical and quantitative variables examined in the study. Then, the investigational results of each research question are presented, including the univariate and multivariate analyses of marginal and joint effects of depression and chronic illness on productivity and the use of health services.
+
+## Univariate Analysis
+For categorical variables, response rates, category frequencies, and proportions, differences in proportions and effect sizes are reported. Descriptive statistics are presented for the two quantitative variables: doctor visits, and sick days.
+
+### Categorical Variables
+Average valid response rate, as indicated in `r figr("categorical", TRUE, type="Table")`, was `r round(sum(univariate$categorical$Valid) / sum(univariate$categorical$Responses) * 100, 0)`%, for all variables.
+
+`r figr("categorical", TRUE, type="Table")`: Summary of Univariate Analysis: Categorical Variables
+```{r categorical, include=T, echo = F, results='html'}
+kable(univariate$categorical, digits = 2) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = T, position = "center")
+``` 
+
+#### Depression Variable
+Of the `r univariate$depression$summary[1,4]` responses, `r univariate$depression$summary[1,5]` were valid yielding a response rate of approximately `r round(univariate$depression$summary[1,7],0)`%.  As indicated in `r figr("analyzeDepressionPlot", TRUE, type="Figure")`, the prevalence of diagnoses of depression was `r round(univariate$depression$table[1,3]$Pct, 1)`%.
+
+<div class = 'col2'>
+```{r analyzeDepressionPlot, include=T, echo = F, results='html'}
+univariate$depression$plot
+``` 
+
+
+```{r analyzeDepressionTbl, include=T, echo = F, results='html'}
+kable(univariate$depression$table, digits = 1) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
+``` 
+</div>
+
+An estimated $p =$ 18.2 percent of the American population suffers from depression [@Bekiempis2014a]. A one-proportion z-test was conducted, with a significance level of $\alpha$ = .05, to estimate the difference between the hypothesized proportion, $p$, and the observed proportion, $\hat{p}$ = `r round(univariate$depression$table[1,3]$Pct, 1)` under the following hypotheses:
+
+$H_0$ $p = \hat{p}$  
+$H_a$ $p \neq \hat{p}$
+
+The difference in proportions, `r round(univariate$depression$table[1,3]$Pct - 18.2, 2)`, was statistically significant ($z$ = `r round(univariate$depression$zTest$statistic, 0)`, $p < .001$, two-tailed) with a 95% CI[`r round(univariate$depression$zTest$conf.int[1], 3)`, `r round(univariate$depression$zTest$conf.int[2], 3)`] for the difference in proportions. The effect in terms of relative risk was `r round(univariate$depression$table[1,3]$Pct / 18.2, 2)`.  The prevalence of depression in the sample was greater than that of the population.
+
+#### Chronic Illness Variable
+The 'Chronic' variable, as characterized in `r figr("analyzeChronicPlot", TRUE, type="Figure")`, was derived from the ten categorical dichotomous variables with a collective response rate of `r round(univariate$chronic$summary[1,7], 0)`%. The percent of respondents reporting a diagnosis of one or more chronic conditions was `r univariate$chronic$table[1,3]$Pct`%.
+
+<div class = 'col2'>
+```{r analyzeChronicPlot, include=T, echo = F, results='html'}
+univariate$chronic$plot
+``` 
+
+```{r analyzeChronicTbl, include=T, echo = F, results='html'}
+kable(univariate$chronic$table, digits = 1) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
+``` 
+
+</div>
+`r figr("analyzeChronicPlot", TRUE, type="Figure")`: Frequency distribution of diagnoses of chronic illness
+
+An estimated $p =$ 60 percent of the American population suffers from one ore more chronic illnesses [@Buttorff2017]. A one-proportion z-test was conducted, with a significance level of $\alpha$ = .05, to estimate the difference between the hypothesized proportion, $p$, and the observed proportion, $\hat{p}$ = `r round(univariate$chronic$table[1,3]$Pct, 1)` under the following hypotheses:
+
+$H_0$ $p = \hat{p}$  
+$H_a$ $p \neq \hat{p}$
+
+The difference in proportions, `r round(univariate$chronic$table[1,3]$Pct - 18.2, 2)`, was statistically significant ($z$ = `r round(univariate$chronic$zTest$statistic, 0)`, $p < .001$, two-tailed) with a 95% CI[`r round(univariate$chronic$zTest$conf.int[1], 3)`, `r round(univariate$chronic$zTest$conf.int[2], 3)`] for the difference in proportions. The effect regarding relative risk was `r round(univariate$chronic$table[1,3]$Pct / 60, 2)`.  The prevalence of chronic illness in the sample was lower than the hypothesized population proportion.
+
+#### Income Variable
+The 'Income' variable, a five level ordinal categorical variable, had a response rate of `r round(univariate$income$summary[1,7], 0)`%, leaving a total sample size of `r univariate$income$summary[1,5]`. The frequency distribution is summarized in `r figr("analyzeIncomePlot", TRUE, type="Figure")`.
+
+<div class = 'col2'>
+```{r analyzeIncomePlot, include=T, echo = F, results='html', fig.height = 8}
+univariate$income$plot
+``` 
+
+```{r analyzeIncomeTbl, include=T, echo = F, results='html', fig.height=8}
+kable(univariate$income$table, digits = 1) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
+``` 
+
+</div>
+`r figr("analyzeIncomePlot", TRUE, type="Figure")`: Frequency distribution of income levels
+
+#### Education Variable
+The 'Education' variable, a four level ordinal categorical variable, had a response rate of approximately `r round(univariate$education$summary[1,7], 0)`%, leaving a total sample size of `r univariate$education$summary[1,5]`. The frequency distribution is summarized in `r figr("analyzeEducationPlot", TRUE, type="Figure")`.
+
+<div class = 'col2'>
+```{r analyzeEducationPlot, include=T, echo = F, results='html', fig.height=10}
+univariate$education$plot
+``` 
+
+```{r analyzeEducationTbl, include=T, echo = F, results='html', fig.height=10}
+kable(univariate$education$table, digits = 1) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
+``` 
+</div>
+`r figr("analyzeEducationPlot", TRUE, type="Figure")`: Frequency distribution of education level completed
+
+
+### Quantitative Variables
+The descriptive statistics, distributions, outliers, spread, central tendencies, skew and kurtosis of the sick days and Dr. visits variables are summarized below.
+
+#### Sick Days Variable
+As shown in `r figr("sickDaysStats", TRUE, type="Table")`, the SickDays variable had a response rate of `r round(as.numeric(univariate$sickDays$stats1[1,5]), 1)`%, reducing the available sample size to `r univariate$sickDays$stats1[1,4]` observations. Significant right skew, signaled by the difference between the mean and median, and confirmed by the skew and kurtosis measurements, was extant.  
+
+`r figr("sickDaysStats", TRUE, type="Table")`: Descriptive Statistics for Sick Days Variable
+```{r sickDaysStats, include=T, echo = F, results='html'}
+kable(univariate$sickDays$stats1, digits = c(0,0,0,0,1,0,0,0,2,0,3,0,0,2,3,2,2), format = 'html')
+``` 
+
+The distribution of sick days, characterized in `r figr("sickDaysHist1", TRUE, type="Figure")`, included `r length(brfss$SickDays[brfss$SickDays == 0 & !is.na(brfss$SickDays)])` respondents (`r round(length(brfss$SickDays[brfss$SickDays == 0 & !is.na(brfss$SickDays)]) / univariate$sickDays$stats1[1,4] * 100, 1)`%) who reported zero sick days. To better reveal the distribution, reports of zero sick days were removed, and the new distribution is rendered in `r figr("sickDaysHist2", TRUE, type="Figure")`.
+
+```{r sickDaysHist1, include=T, echo = F, results='html'}
+univariate$sickDays$hist1
+``` 
+`r figr("sickDaysHist1", TRUE, type="Figure")`: Histogram of sick days reported during the previous 30 days
+
+As shown in `r figr("sickDaysHist2", TRUE, type="Figure")`, the average number of sick days, among those reporting one or more sick days, was `r round(as.numeric(univariate$sickDays$stats2[1,9]), 1)`, with a median of `r univariate$sickDays$stats2[1,8]` sick days. The plurality was `r univariate$sickDays$stats2[1,10]` sick days.
+
+```{r sickDaysHist2, include=T, echo = F, results='html'}
+univariate$sickDays$hist2
+``` 
+`r figr("sickDaysHist2", TRUE, type="Figure")`: Histogram of one or more sick days during the previous 30 days
+
+
+#### Visits Variable
+The Visits variable, as shown in `r figr("visitsStats", TRUE, type="Table")`, had a slightly higher response rate of `r round(univariate$visits$stats[1,5], 0)`%, reducing the available sample size to `r round(univariate$visits$stats[1,4], 0)` observations. The distribution, $Med$ = `r univariate$visits$stats[1,8]`, $\bar{x}$ = `r univariate$visits$stats[1,9]`, $SD$ = `r univariate$visits$stats[1,14]`, was also significantly right-skewed.
+
+`r figr("visitsStats", TRUE, type="Table")`: Descriptive Statistics for Dr. Visits Variable
+```{r visitsStats, include=T, echo = F, results='html'}
+kable(univariate$visits$stats, digits = c(0,0,0,0,0,0,0,0,2,0,3,0,0,2,3,2,2)) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
+``` 
+
+As presented in `r figr("visitsHist", TRUE, type="Figure")`, `r length(brfss$Visits[brfss$Visits == 0 & !is.na(brfss$Visits)])` respondents (`r round(length(brfss$Visits[brfss$Visits == 0 & !is.na(brfss$Visits)]) / univariate$visits$stats[1,4] * 100, 1)`% of valid responses) reported zero Dr. visits during the year preceding the survey.
+
+```{r visitsHist, include=T, echo = F, results='html'}
+univariate$visits$hist
+``` 
+`r figr("visitsHist", TRUE, type="Figure")`: Histogram of the number of Dr. visits during previous 12 months
+
+## Research Question 1: Depression Sociodemographics
+Is there an association between education and income and the prevalence of depression? The analysis below shows that diagnoses of depression were negatively correlated with income. The relationship between depression and scholastic achievement was more knotty than that between depression and financial compensation. The minimum and maximum rates of depression matched with the highest and slightest levels of academic attainment; however, high school graduates suffered in greater proportion than those who attended but did not complete college or a technical school.
+
+### Depression and Income (Marginal Association)
+This analysis found that depression was inversely associated with income, $X^2$ = `r rq1$tests$incomeInd$statistic`, $N$ = `r rq1$tables$incomeFreq[6,3]`, $df$ = `r rq1$tests$incomeInd$parameter`, $p < .001$ and a strength of `r round(rq1$tests$incomeIndV$cramer, 3)`.
+
+The combined response rate of the Depression and Income variables was `r round(rq1$tables$incomeFreq[6,3] / nrow(brfss) * 100, 1)`%, yielding `r rq1$tables$incomeFreq[6,3]` completed cases for analysis. `r figr("rq1IncomeFreqTable", TRUE, type="Table")` and `r figr("rq1IncomePropTable", TRUE, type="Table")` show the frequencies and proportions, respectively, of depression diagnoses for each income level.
+
+<center>
+`r figr("rq1IncomeFreqTable", TRUE, type="Table")`: Marginal contingency table of frequencies of depression diagnoses by income level
+```{r rq1IncomeFreqTable, include=T, echo = F, results='asis'}
+stargazer(format(rq1$tables$incomeFreq, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+``` 
+</center>
+
+<center>
+`r figr("rq1IncomePropTable", TRUE, type="Table")`: Marginal contingency table of proportions of depression diagnoses by income level
+```{r rq1IncomePropTable, include=T, echo = F, results='asis'}
+stargazer(format(rq1$tables$incomeProp, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+``` 
+</center>
+
+Of those respondents who reported income, `r rq1$tables$incomeFreq[6,1]` (`r round(rq1$tables$incomeFreq[6,1] / rq1$tables$incomeFreq[6,3] * 100, 2)`%) indicated a prior diagnosis of depression. Stated in `r figr("rq1IncomePropTable", TRUE, type="Table")` and further clarified in `r figr("rq1IncomePlots", TRUE, type="Figure")`, rates of depression were inversely associated with income. 
+
+```{r rq1IncomePlots, include=T, echo = F, results='html'}
+grid.arrange(rq1$plots$incomeFreq, rq1$plots$incomeProp, ncol = 2)
+``` 
+`r figr("rq1IncomePlots", TRUE, type="Figure")`: Marginal frequencies and proportions of depression diagnoses by income level
+
+The mosaic plot below graphically depicts the association between depression diagnoses and financial compensation levels, vis-a-vis the independence model. 
+```{r rq1IncomeMosaic, include=T, fig.height=10, fig.width=14, echo = F, results='html'}
+  mosaic(rq1$tables$incomeTable, shade = TRUE, legend = TRUE,
+         labeling= labeling_border(rot_labels = c(0,0,0,0), 
+                                   varnames = c(FALSE, TRUE),
+                                   gp_labels = gpar(fontsize = 10),
+                                   just_labels = c("left", 
+                                                   "center", 
+                                                   "center", 
+                                                   "right")))
+``` 
+`r figr("rq1IncomeMosaic", TRUE, type="Figure")`: Mosaic plot of marginal relationship between depression and income
+
+In `r figr("rq1IncomeMosaic", TRUE, type="Figure")`, the width of the bars indicates the relative proportion of respondents at each  income level that either had or had not a diagnosis of depression. For instance, the "50,000 or more" income level had the smallest proportion of respondents with a diagnosis of depression. The height of the bars connotes the percentage of the overall responses by salary level.  The colors express residuals from the Pearson chi-square model of independence.  Blue implies that observed frequencies were greater than expected for independence.  Red suggests fewer observations than expected. Grey denotes that observed and expected frequencies were approximately equal.  To sum, the observed frequencies of depression diagnoses for the two lowest income categories were greater than expected assuming independence. The two highest income levels had too few.  The 25,000 to 35,000 income level frequencies were approximately equal to expected.
+
+The differences in proportions were tested for statistical significance with a chi-squared at a significance level of $\alpha$ = .05, under the following hypotheses:
+
+$H_0$: Diagnoses of depression and income level are independent   
+$H_a$: Diagnoses of depression and income level are not independent   
+
+The differences in proportions were statistically significant, $X^2$ = `r rq1$tests$incomeInd$statistic`, $N$ = `r rq1$tables$incomeFreq[6,3]`, $df$ = `r rq1$tests$incomeInd$parameter`, and $p < .001$. The strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$incomeIndV$cramer, 3)`. Nonetheless, the null hypothesis was rejected in favor of the alternative hypothesis of the association between depression and income.
+
+Lastly, `r figr("rq1IncomeOdds", TRUE, type="Figure")` presents the odds ratios at each income level.  
+
+`r figr("rq1IncomeOdds", TRUE, type="Table")`: The marginal odds ratios of a diagnosis of depression by income level 
+```{r rq1IncomeOdds, include=T, echo = F, results='html'}
+kable(rq1$analysis$incomeOdds, digits = 2) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = T, position = "center")
+``` 
+
+The odds of a diagnosis of depression decreased with increasing income until the highest level was reached at which point, the odds increased.  
+
+In conclusion, this analysis has shown that rates of depression were inversely correlated with income with a significance of $X^2$ = `r rq1$tests$incomeInd$statistic`, $N$ = `r rq1$tables$incomeFreq[6,3]`, $df$ = `r rq1$tests$incomeInd$parameter`, and $p < .001$. The strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$incomeIndV$cramer, 3)`.
+
+### Depression and Education (Marginal Association)
+This analysis revealed a significant marginal association between education and diagnoses of depression $X^2$ = `r rq1$tests$educationInd$statistic`, $N$ = `r rq1$tables$educationFreq[5,3]`, $df$ = `r rq1$tests$educationInd$parameter`, and $p < .001$. The strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$educationIndV$cramer, 3)`.
+
+The combined response rate of the Depression and Education variables was `r round(rq1$tables$educationFreq[5,3] / nrow(brfss) * 100, 2)`%, yielding `r rq1$tables$educationFreq[5,3]` completed cases for analysis. `r figr("rq1EducationFreqTable", TRUE, type="Table")` and `r figr("rq1EducationPropTable", TRUE, type="Table")` show the frequencies and proportions of depression diagnoses for each education category.
+
+<center>
+`r figr("rq1EducationFreqTable", TRUE, type="Table")`: Marginal contingency table of frequencies of depression diagnoses by education level
+```{r rq1EducationFreqTable, include=T, echo = F, results='asis'}
+stargazer(format(rq1$tables$educationFreq, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+``` 
+</center>
+
+<center>
+`r figr("rq1EducationPropTable", TRUE, type="Table")`: Marginal contingency table of proportions of depression diagnoses by education level
+```{r rq1EducationPropTable, include=T, echo = F, results='asis'}
+stargazer(format(rq1$tables$educationProp, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+``` 
+</center>
+
+Of those respondents who reported education, `r rq1$tables$educationFreq[5,1]` (`r round(rq1$tables$educationFreq[5,1] / rq1$tables$educationFreq[5,3] * 100, 2)`%) indicated a prior diagnosis of depression. 
+
+The following bar charts provide graphical representations of the marginal frequencies and proportions of depression diagnoses by education category. `r figr("rq1EducationPlots", TRUE, type="Figure")` shows that the lowest and highest rates of depression were associated the highest and lowest levels of education; and, those that attended, but did not complete college or a trade school had diagnoses of depression at a slightly higher rate than those who had only completed high school.
+
+```{r rq1EducationPlots, include=T, echo = F, results='html'}
+grid.arrange(rq1$plots$educationFreq, rq1$plots$educationProp, ncol = 2, top = "Distribution of Diagnoses of Depression")
+``` 
+`r figr("rq1EducationPlots", TRUE, type="Figure")`: Marginal frequencies and proportions of depression diagnoses by education level completed
+
+The mosaic plot below graphically depicts the association between depression diagnoses and education levels, vis-a-vis the independence model. 
+```{r rq1EducationMosaic, include=T, fig.height=10, fig.width=14, echo = F, results='html'}
+  mosaic(rq1$tables$educationTable, shade = TRUE, legend = TRUE,
+         labeling= labeling_border(rot_labels = c(0,0,0,0), 
+                                   varnames = c(FALSE, TRUE),
+                                   gp_labels = gpar(fontsize = 15),
+                                   just_labels = c("left", 
+                                                   "center", 
+                                                   "center", 
+                                                   "right")))
+``` 
+`r figr("rq1EducationMosaic", TRUE, type="Figure")`: Mosaic plot of marginal relationship between depression and education
+
+As shown in `r figr("rq1EducationMosaic", TRUE, type="Figure")`,  the numbers of observed diagnoses of depression among those that did not graduate from high school, and those that attended college or technical school were greater than expected under the independence model.  Observed and expected frequencies of depression diagnoses among high-school graduates were approximately equal.  Finally, observed frequencies of diagnoses of depression among college graduates were lower than expected under independence model.
+
+The differences in proportions were tested for statistical significance with a chi-squared at a significance level of $\alpha$ = .05, under the following hypotheses:
+
+$H_0$: Diagnoses of depression and education level are independent   
+$H_a$: Diagnoses of depression and education level are not independent   
+
+The differences in proportions were statistically significant, $X^2$ = `r rq1$tests$educationInd$statistic`, $N$ = `r rq1$tables$educationFreq[5,3]`, $df$ = `r rq1$tests$educationInd$parameter`, and $p$ < .001. The strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$educationIndV$cramer, 3)`.
+
+Lastly, `r figr("rq1EducationOdds", TRUE, type="Figure")` presents the odds of a depression diagnosis at each level of education.
+
+`r figr("rq1EducationOdds", TRUE, type="Table")`: The marginal odds ratios of a diagnosis of depression by education level 
+```{r rq1EducationOdds, include=T, echo = F, results='html'}
+kable(rq1$analysis$educationOdds, digits = 2) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = T, position = "center")
+``` 
+The odds of a diagnoses of depression were substantially greater among those that did not graduate high school vis-a-vis high school graduates.  Odds decreased for those that attended some college or technical school, then increased substantially for college graduates.
+
+Summing up, this analysis has revealed an association between income and diagnoses of depression with a significance of $X^2$ = `r rq1$tests$educationInd$statistic`, $N$ = `r rq1$tables$educationFreq[5,3]`, $df$ = `r rq1$tests$educationInd$parameter`, and $p$ < .001. The strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$educationIndV$cramer, 3)`. Lower rates of depression were associated with high school and college graduates. The highest rates of depression were among those that did not graduate from high-school and those that attended some college or technical school, but did not graduate. 
+
+### Depression by Income, Control by Education (Conditional Association)
+The conditional association of income and depression, controlling for education was significant at each level of education. In other words, rates of depression and income were inversely associated, regardless of education level, as `r figr("rq1InteractionPlots", TRUE, type="Figure")` presents.
+
+```{r rq1InteractionPlots, include=T, echo = F, fig.height=10, results='html'}
+grid.arrange(rq1$plots$conditionalProp[[1]], rq1$plots$conditionalProp[[2]],
+             rq1$plots$conditionalProp[[3]], rq1$plots$conditionalProp[[4]], ncol = 2, top = "Proportional Distribution of Depression by Income and Education")
+``` 
+`r figr("rq1InteractionPlots", TRUE, type="Figure")`: Conditional proportions of depression diagnoses by income, controlling for education
+
+The mosaic plot in `r figr("rq1ConditionalMosaic", TRUE, type="Figure")` graphically depicts the association between depression diagnoses and income levels, controlling for education, vis-a-vis the independence model. 
+```{r rq1ConditionalMosaic, include=T, fig.height=6, fig.width=10, echo = F, results='html'}
+lnames <- list(Income = c("< 15k", "< 25k", "< 35k", "< 50k", "50k +"),
+               Education = c("Did not graduate high school", "Graduated high school",
+                             "Some College", "Graduated College"))
+  mosaic(rq1$tables$freq, shade = TRUE, legend = TRUE,
+         labeling= labeling_border(rot_labels = c(0,0,0,0), 
+                                   varnames = c(FALSE, TRUE),
+                                   gp_labels = gpar(fontsize = 10),
+                                   just_labels = c("left", 
+                                                   "center", 
+                                                   "center", 
+                                                   "right"),
+                                   set_labels = lnames))
+``` 
+`r figr("rq1ConditionalMosaic", TRUE, type="Figure")`: Mosaic plot of marginal relationship between depression and income
+
+The plot of Pearson residuals in `r figr("rq1ConditionalMosaic", TRUE, type="Figure")` suggests an association between financial compensation and depression at every level of education. The difference in proportions of depression diagnoses among the income categories, controlling for education was tested using the Cochran-Mantel-Haenszel test with a significance level of $\alpha$ = .05, under the following hypotheses:
+
+$H_0$: Diagnoses of depression are independent of income at every level education  
+$H_a$: Diagnoses of depression are not independent of income and at every level education
+
+The following tables summarize the conditional association of depression and income at each level of education.
+
+<div class = 'col2'>
+`r figr("rq1CMH1", TRUE, type="Table")`: Conditional association of depression and income. Stratum: Did not graduate high school
+```{r rq1CMH1, include=T, echo = F, results='html'}
+kable(rq1$tests$condInd[[1]]$df, digits = c(0,0,0,0,4), caption = 'Cochran–Mantel–Haenszel for Depression by Income') %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  add_header_above(c('Stratum: Did not graduate high school' = 5))
+``` 
+
+`r figr("rq1CMH2", TRUE, type="Table")`: Conditional association of depression and income. Stratum: Graduated high school
+```{r rq1CMH2, include=T, echo = F, results='html'}
+kable(rq1$tests$condInd[[2]]$df, digits = c(0,0,0,0,4), caption = 'Cochran–Mantel–Haenszel for Depression by Income') %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  add_header_above(c('Stratum: Graduated high school' = 5))
+``` 
+
+</div>
+
+<div class = 'col2'>
+`r figr("rq1CMH3", TRUE, type="Table")`: Conditional association of depression and income. Stratum: Attended college or technical school
+```{r rq1CMH3, include=T, echo = F, results='html'}
+kable(rq1$tests$condInd[[3]]$df, digits = c(0,0,0,0,4), caption = 'Cochran–Mantel–Haenszel for Depression by Income') %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  add_header_above(c('Stratum: Attended college or technical school' = 5))
+``` 
+
+`r figr("rq1CMH4", TRUE, type="Table")`: Conditional association of depression and income. Stratum: Graduated college or technical school
+```{r rq1CMH4, include=T, echo = F, results='html'}
+kable(rq1$tests$condInd[[4]]$df, digits = c(0,0,0,0,4), caption = 'Cochran–Mantel–Haenszel for Depression by Income') %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  add_header_above(c('Stratum: Graduated college or technical school' = 5))
+``` 
+
+</div>
+
+As indicated in `r figr("rq1CMH1", TRUE, type="Table")`, `r figr("rq1CMH2", TRUE, type="Table")`, `r figr("rq1CMH3", TRUE, type="Table")`, and `r figr("rq1CMH4", TRUE, type="Table")`, the differences in proportions were significant, $p$ < .001, across each education level. To ascertain the strength of the associations, odds ratios were computed. `r figr("rq1ConditionaOdds1", TRUE, type="Table")`, `r figr("rq1ConditionaOdds2", TRUE, type="Table")`, `r figr("rq1ConditionaOdds3", TRUE, type="Table")`. and `r figr("rq1ConditionaOdds4", TRUE, type="Table")` list the conditional odds ratios at each level of education.  
+
+<div class = 'col2'>
+`r figr("rq1ConditionaOdds1", TRUE, type="Table")`: Conditional odds ratios of depression and income. Stratum: Did not graduate high school
+```{r rq1ConditionaOdds1, include=T, echo = F, results='html'}
+kable(rq1$analysis$conditionalOdds[[1]]$df, digits = 2, caption = 'Conditional Odds Ratios for Depression by Income') %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  add_header_above(c('Stratum: Did not graduate high school' = 2))
+``` 
+
+`r figr("rq1ConditionaOdds2", TRUE, type="Table")`: Conditional odds ratios of depression and income. Stratum: Graduated high school
+```{r rq1ConditionaOdds2, include=T, echo = F, results='html'}
+kable(rq1$analysis$conditionalOdds[[2]]$df, digits = 2, caption = 'Conditional Odds Ratios for Depression by Income') %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  add_header_above(c('Stratum: Graduated high school' = 2))
+``` 
+</div>
+
+<div class = 'col2'>
+`r figr("rq1ConditionaOdds3", TRUE, type="Table")`: Conditional odds ratios of depression and income. Stratum: Attended college or technical school
+```{r rq1ConditionaOdds3, include=T, echo = F, results='html'}
+kable(rq1$analysis$conditionalOdds[[3]]$df, digits = 2, caption = 'Conditional Odds Ratios for Depression by Income') %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  add_header_above(c('Stratum: Attended college or technical school' = 2))
+``` 
+
+`r figr("rq1ConditionaOdds4", TRUE, type="Table")`: Conditional odds ratios of depression and income. Stratum: Graduated college or technical school
+```{r rq1ConditionaOdds4, include=T, echo = F, results='html'}
+kable(rq1$analysis$conditionalOdds[[4]]$df, digits = 2, caption = 'Conditional Odds Ratios for Depression by Income') %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  add_header_above(c('Stratum: Graduated college or technical school' = 2))
+``` 
+</div>
+
+The association between diagnoses of depression and income was strongest at the lowest level of income, ranging from a maximum strength of `r round(max(rq1$analysis$conditionalOdds[[1]]$df$Odds[1],rq1$analysis$conditionalOdds[[2]]$df$Odds[1],rq1$analysis$conditionalOdds[[3]]$df$Odds[1],rq1$analysis$conditionalOdds[[4]]$df$Odds[1]), 2)` to a minimum strength of `r round(min(rq1$analysis$conditionalOdds[[1]]$df$Odds[4],rq1$analysis$conditionalOdds[[2]]$df$Odds[4],rq1$analysis$conditionalOdds[[3]]$df$Odds[4],rq1$analysis$conditionalOdds[[4]]$df$Odds[4]), 2)` and tended to decline at each higher level of income. This pattern was evident across all education levels. 
+
+In conclusion, depression was inversely associated with income at every level of education. The strength of the association was greatest at the lower salary levels and diminishes with increased income.
+
+### Depression and Income and Education (Joint Association)
+Is there a joint association between income and scholastic achievement and diagnoses of depression? The association is affirmed by this analysis with a statistical significance of $X^2$ ($df$ = `r rq1$tests$jointInd$parameter`, $N$ = `r rq1$tables$interactionFreq[21,3]`) = `r round(rq1$tests$jointInd$statistic, 0)`, $p$ < .001. The overall strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$jointIndV$cramer, 3)`.
+
+The combined response rate of the income, education, and depression variables was `r round(rq1$tables$interactionFreq[21,3] / nrow(brfss) * 100, 1)`%, yielding `r rq1$tables$interactionFreq[21,3]` completed cases for analysis. `r figr("rq1InteractionFreqTable", TRUE, type="Table")` and `r figr("rq1InteractionPropTable", TRUE, type="Table")` show the frequencies and proportions of depression diagnoses by the combination of income and education.
+
+<center>
+`r figr("rq1InteractionFreqTable", TRUE, type="Table")`: Contingency table of frequencies of depression diagnoses by income and education levels
+```{r rq1InteractionFreqTable, include=T, echo = F, results='asis'}
+stargazer(format(rq1$tables$jointFreq, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+``` 
+</center>
+
+<center>
+`r figr("rq1InteractionPropTable", TRUE, type="Table")`: Contingency table of proportions of depression diagnoses by income and education levels
+```{r rq1InteractionPropTable, include=T, echo = F, results='asis'}
+stargazer(format(rq1$tables$jointProp, quote = FALSE, justify = "right", big.mark = ",", digits = 3),  type = 'html')
+``` 
+</center>
+
+Of those respondents who reported income, education, and depression data, `r rq1$tables$interactionFreq[21,1]` (`r round(rq1$tables$interactionFreq[21,1] / rq1$tables$interactionFreq[21,3] * 100, 2)`%) indicated a prior diagnosis of depression. The highest rates of depression diagnoses ($\hat{p}$ = `r round(head(rq1$dataFrames$propDf %>% filter(Depression == 'Yes') %>% arrange(desc(Freq)) %>% select(Freq), 1)$Freq, 3)`) were among those who `r tolower(head(rq1$dataFrames$propDf %>% filter(Depression == 'Yes') %>% arrange(desc(Freq)) %>% select(Income, Education), 1)$Education)` within the  `r tolower(head(rq1$dataFrames$propDf %>% filter(Depression == 'Yes') %>%  arrange(desc(Freq)) %>% select(Income, Education), 1)$Income)` income category. Those who `r tolower(head(rq1$dataFrames$propDf %>% filter(Depression == 'Yes') %>% arrange(Freq) %>% select(Income, Education), 1)$Education)` in the `r head(rq1$dataFrames$propDf %>% filter(Depression == 'Yes') %>% arrange(Freq) %>% select(Income, Education), 1)$Income` category had the lowest rates of depression ($\hat{p}$ = `r round(head(rq1$dataFrames$propDf %>% filter(Depression == 'Yes') %>% arrange(Freq) %>% select(Freq), 1)$Freq, 3)`).
+
+
+The mosaic plot below reveals significant differences in proportions of depression diagnoses, vis-a-vis the proportions expected under the independence model. 
+```{r rq1InteractionMosaic, include=T, fig.height=16, fig.width=18, echo = F, results='html'}
+lnames <- list(IncomeEducation = c("No High School (<15k)",
+                                   "No High School (<25k)",
+                                   "No High School (<35k)",
+                                   "No High School (<50k)",
+                                   "No High School (50k+)",
+                                   "High School (<15k)",
+                                   "High School (<25k)",
+                                   "High School (<35k)",
+                                   "High School (<50k)",
+                                   "High School (50k+)",
+                                   "Some College(<15k)",
+                                   "Some College (<25k)",
+                                   "Some College (<35k)",
+                                   "Some College (<50k)",
+                                   "Some College (50k+)",
+                                   "College Graduage(<15k)",
+                                   "College Graduage(<25k)",
+                                   "College Graduage(<35k)",
+                                   "College Graduage(<50k)",
+                                   "College Graduage(50k+)"))
+  mosaic(rq1$tables$interactionTable, shade = TRUE, legend = TRUE,
+         labeling= labeling_border(rot_labels = c(0,0,0,0), 
+                                   varnames = c(FALSE, TRUE),
+                                   gp_labels = gpar(fontsize = 10),
+                                   gp_varnames = gpar(fontsize = 20),
+                                   just_labels = c("left", 
+                                                   "center", 
+                                                   "center", 
+                                                   "right"),
+                                   set_labels = lnames))
+``` 
+`r figr("rq1InteractionMosaic", TRUE, type="Figure")`: Mosaic plot of joint association between depression and income and education
+
+In `r figr("rq1InteractionMosaic", TRUE, type="Figure")`, blue indicates that the observed frequencies were greater than the expected frequencies under the independence mode, red means that the observed frequencies were fewer than the expected frequencies.
+
+The differences in proportions were tested for statistical significance with a chi-squared at a significance level of $\alpha$ = .05, under the following hypotheses:
+
+$H_0$: Income and education are jointly independent of diagnoses of depression   
+$H_a$: Income and education are not jointly independent of diagnoses of depression   
+
+The differences in proportions were statistically significant, $X^2$ (`r rq1$tests$jointInd$parameter`, $N$ = `r rq1$tables$interactionFreq[21,3]`) = `r round(rq1$tests$jointInd$statistic, 0)`, $p$ < .001. The overall strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$jointIndV$cramer, 3)`. Nonetheless, the null hypothesis of joint independence was rejected.
+
+
+Odds ratios were calculated (`r figr("rq1JointOdds", TRUE, type="Table")`) to determine the strength of the association. 
+
+`r figr("rq1JointOdds", TRUE, type="Table")`: Joint odds ratios of depression and income and education. 
+```{r rq1JointOdds, include=T, echo = F, results='html'}
+kable(rq1$analysis$interactionOdds %>% select(Income, Odds), digits = 2) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  group_rows("Did not graduate high school/Yes:No",1,5) %>%
+  group_rows("Graduate high school/Yes:No",6,10) %>%
+  group_rows("Attended college or technical school/Yes:No",11,15) %>%
+  group_rows("Graduated college or technical school/Yes:No",16,19)
+``` 
+
+To wrap up, the data support the presence of marginal, conditional and joint associations between depression diagnosis and income and education. Income was inversely associated with rates of depression $X^2$ = `r rq1$tests$incomeInd$statistic`, $N$ = `r rq1$tables$incomeFreq[6,3]`, $df$ = `r rq1$tests$incomeInd$parameter`, and $p < .001$. The strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$incomeIndV$cramer, 3)`. Rates of depression diagnoses were also marginally associated with education level completed $X^2$ = `r rq1$tests$educationInd$statistic`, $N$ = `r rq1$tables$educationFreq[5,3]`, $df$ = `r rq1$tests$educationInd$parameter`, and $p$ < .001. The strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$educationIndV$cramer, 3)`.Conditional associations between rates of depression and income were extant at each level of education with a significance of $p$ < .001.  Lastly, income and education were found to be jointly associated with depression diagnoses $X^2$ (`r rq1$tests$jointInd$parameter`, $N$ = `r rq1$tables$interactionFreq[21,3]`) = `r round(rq1$tests$jointInd$statistic, 0)`, $p$ < .001. The overall strength of the association using Cramer's V [@Cramer1946] was `r round(rq1$tests$jointIndV$cramer, 3)`.
+
+## Research Question #2: Depression and Chronic Disease
+Is there a relationship between depression and chronic illness? According to this analysis, chronic disease was associated with depression with a statistical significance of , $X^2$ (`r rq2$tests$X2$parameter`, $N$ = `r sum(rq2$tables$freq)`) = `r round(rq2$tests$X2$statistic, 0)`, $p < .001$. The likelihood of a diagnosis of a chronic condition with depression, was `r round(rq2$tests$odds$Odds, 2)` times the likelihood of a diagnosis of chronic disease without a diagnosis of depression. 
+
+`r figr("rq2FreqTbl", TRUE, type="Table")`, `r figr("rq2PropTbl", TRUE, type="Table")` and `r figr("rq2Plots", TRUE, type="Figure")` present a total of `r sum(rq2$tables$freq)` responses. Of those reporting a diagnosis of depression, `r round(rq2$tables$prop[1,1] * 100, 1)`% also had diagnoses of chronic illness. The proportion of diagnoses of chronic illness among those not reporting a prior diagnosis of depression dropped significantly to `r round(rq2$tables$prop[2,1] * 100, 1)`%.
+
+<div class = 'col2'>
+`r figr("rq2FreqTbl", TRUE, type="Table")`: Depression and chronic illness contingency table
+```{r rq2FreqTbl, include=T, echo = F, results='asis'}
+stargazer(format(rq2$tables$freq, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+``` 
+
+`r figr("rq2PropTbl", TRUE, type="Table")`: Depression and chronic illness contingency table
+```{r rq2PropTbl, include=T, echo = F, results='asis'}
+stargazer(format(rq2$tables$prop, quote = FALSE, digits = 2, justify = "right", big.mark = ","), type = 'html')
+``` 
+</div>
+
+```{r rq2Plots, include=T, echo = F, results='html'}
+grid.arrange(rq2$plots$freq, rq2$plots$prop, ncol = 2, top = "Depression and Chronic Illness")
+``` 
+`r figr("rq2Plots", TRUE, type="Figure")`: Marginal frequencies and proportions of depression diagnoses by income category
+
+A Pearson's residuals analysis was administered to assess the relationship between the diagnoses of depression and chronic illness. `r figr("rq2Mosaic", TRUE, type="Figure")` shows a positive correlation between the two variables, n = `r sum(rq2$tables$freq)`, $p$ < 0.001. The colors indicate the degree of departure of the observed frequencies from expected frequencies under the model of independence. Blue indicates observed frequencies were greater than expected values; whereas, red denotes observed frequencies were less than expected.
+
+```{r rq2Mosaic, include=T, fig.height=8, fig.width=10, echo = F, results='html'}
+  mosaic(rq2$tables$r2, shade = TRUE, legend = TRUE,
+         labeling = labeling_border(rot_labels = c(0,0,0,0),
+                                   offset_labels = c(0,0,0,0), 
+                                   varnames = c(TRUE, TRUE),
+                                   gp_labels = gpar(fontsize = 10),
+                                   just_labels = c("left", 
+                                                   "center", 
+                                                   "center", 
+                                                   "right")))
+``` 
+`r figr("rq2Mosaic", TRUE, type="Figure")`: Mosaic plot of depression and chronic illness association
+
+A chi-squared test of independence was administered with a significance level $\alpha$ = .05, under the following hypotheses:
+
+$H_0$: Diagnoses of depression and chronic illness are independent   
+$H_a$: Diagnoses of depression and chronic illness are not independent   
+
+In conclusion, the differences in proportions were statistically significant, $X^2$ (`r rq2$tests$X2$parameter`, $N$ = `r sum(rq2$tables$freq)`) = `r round(rq2$tests$X2$statistic, 0)`, $p < .001$. The strength of the association using Cramer's V [@Cramer1946] was `r round(rq2$tests$assoc$cramer, 3)`. The likelihood of a diagnosis of chronic illness with depression, was `r round(rq2$tests$odds$Odds, 2)` times the likelihood of a diagnosis of chronic illness without a diagnosis of depression. 
+
+## Research Question #3: Depression, Chronic Illness and Productivity
+Is there a relationship between depression, chronic illness, and productivity? Marginally speaking, those with a diagnosis of depression reported `r round((rq3$stats$depression$Mean[1] / rq3$stats$depression$Mean[2] * 100) - 100, 1)`% more sick days than those without a diagnosis. The average marginal effect of a diagnosis of chronic illness was `r round((rq3$stats$chronic$Mean[1] / rq3$stats$chronic$Mean[2] * 100) - 100, 1)`% on the number of sick days. The greatest effect was observed among those with diagnoses of both depression and chronic illness. This group reported `r round((rq3$stats$interaction[1,8]$Mean / mean(rq3$stats$interaction[2,8]$Mean, rq3$stats$interaction[3,8]$Mean) * 100) - 100, 1)`% more sick days than those with a single diagnosis of either depression or one or more chronic conditions.
+
+### Depression and Productivity
+What is the effect of depression on productivity? The descriptive statistics in `r figr("rq3DepressionStats", TRUE, type="Table")` reveal a difference of `r round(rq3$stats$depression$Mean[1] - rq3$stats$depression$Mean[2], 2)` days on average, a significant result as the following analysis shows. 
+
+`r figr("rq3DepressionStats", TRUE, type="Table")`: Descriptive Statistics of Sick Days by Depression Diagnosis 
+```{r rq3DepressionStats, echo = F, message = FALSE, warning=FALSE}
+kable(rq3$stats$depression) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = T, position = "center")
+```
+
+`r figr("rq3DepressionBar", TRUE, type="Figure")` illuminates the frequency and proportions of reports of sick days vis-a-vis a diagnosis of depression. A total of `r sum(rq3$tables$depressionFreqTbl[,2])` reported one or more sick days, of that number `r round(sum(rq3$tables$depressionFreqTbl[1,2]) / sum(rq3$tables$depressionFreqTbl[,2]) * 100, 1)`% reported a diagnosis of depression. That said, the bar chart on the right reveals that a respondent with a diagnosis of depression was `r round(((rq3$tables$depressionFreqTbl[1,2] / rq3$tables$depressionFreqTbl[1,1]) / (rq3$tables$depressionFreqTbl[2,2] / rq3$tables$depressionFreqTbl[2,1])), 2) ` times as likely to have one or more sick days in a month than those without a diagnosis of depression.   
+
+```{r rq3DepressionBar, include=T, echo = F, results='html'}
+grid.arrange(rq3$plots$depressionFreqBar, rq3$plots$depressionPropBar, ncol = 2, top = 'Depression and Reports of One or More Sick Days')
+``` 
+`r figr("rq3DepressionBar", TRUE, type="Figure")`: Depression and Reports of Health-Related Restricted Activity
+
+Next, the distributions of sick days between the groups are examined.
+
+```{r rq3DepressionBox, include=T, echo = F, results='html'}
+grid.arrange(rq3$plots$depressionViolin, rq3$plots$depressionBox, ncol = 2, top = "Distribution Summary of Reports of Sick Days by Diagnosis of Chronic Illness")
+``` 
+`r figr("rq3DepressionBox", TRUE, type="Figure")`: Distribution Summary of Reports of Sick Days by Diagnosis of Depression
+
+As indicated in `r figr("rq3DepressionBox", TRUE, type="Figure")` the distribution of sick days for those reporting diagnoses of depression was more narrow in the extremes, with a substantially larger interquartile range.  For the group without diagnoses of depression, the reported sick days more closely centered around its median of zero days.
+
+```{r rq3DepressionHist1, include=T, echo = F, results='html'}
+rq3$plots$depressionHist1
+``` 
+`r figr("rq3DepressionHist1", TRUE, type="Figure")`: Distribution of Sick Days by Diagnosis of Depression
+
+As implied by `r figr("rq3DepressionBox", TRUE, type="Figure")`, both distributions peak at zero days; however, the group without depression had substantially higher reports of zero sick days.  To get a better sense of the distribution, reports of zero sick days were removed from the data set and a new density plot was rendered.  As `r figr("rq3DepressionHist1", TRUE, type="Figure")` reveals, the group reporting depression had higher frequencies of reports of longer bouts of restricted activity.
+```{r rq3DepressionHist2, include=T, echo = F, results='html'}
+rq3$plots$depressionHist2
+``` 
+`r figr("rq3DepressionHist1", TRUE, type="Figure")`: Distribution of One or More Sick Days by Diagnosis of Depression
+
+To validate the impact of depression on productivity, a Mann-Whitney-Wilcoxon test was administered with a significance level $\alpha$ - .05, under the following hypotheses:
+
+$H_0$ The distributions of both populations are equal   
+$H_a$ The distributions of both populations are not equal  
+
+Though the medians were the same, there was a statistically significant difference in the distributions, $U$ = (`r round(rq3$tests$depressionTest$statistic, 0)`) , p < .001, two-sided. The 95% CI[`r round(rq3$tests$depressionTest$conf.int[1], 6)`, `r round(rq3$tests$depressionTest$conf.int[2], 6)`] was precise. As such, the null hypothesis was rejected in favor of the alternative hypothesis that the distributions of both populations were not equal. Though the result was significant, the effect was small  `r round(rq3$tests$depressionEffect$statistic, 2)` (Kolmogorov-Smirnov p < .001).
+
+
+### Chronic Illness and Productivity
+What is the effect of chronic disease on productivity? `r figr("rq3ChronicStats", TRUE, type="Table")` exhibits a `r round(rq3$stats$chronic$Mean[1] - rq3$stats$chronic$Mean[2], 2)` day difference in the mean number sick days. The following analysis explores the significance and effect of this difference.
+
+`r figr("rq3ChronicStats", TRUE, type="Table")`: Descriptive Statistics of Restricted Activity Days by Chronic Disease Diagnosis 
+```{r rq3ChronicStats, echo = F, message = FALSE, warning=FALSE}
+kable(rq3$stats$chronic) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
+```
+
+The frequency and proportion tables in `r figr("rq3ChronicBar", TRUE, type="Figure")` cite a total of `r sum(rq3$tables$chronicFreqTbl[,2])` respondents who reported one or more sick days, of that number `r round(sum(rq3$tables$chronicFreqTbl[1,2]) / sum(rq3$tables$chronicFreqTbl[,2]) * 100, 1)`% reported a diagnosis of chronic illness. Respondents with a diagnosis of chronic illness were `r round(((rq3$tables$chronicFreqTbl[1,2] / rq3$tables$chronicFreqTbl[1,1]) / (rq3$tables$chronicFreqTbl[2,2] / rq3$tables$chronicFreqTbl[2,1])), 2) ` times as likely to have one or more sick days in a month than those without a diagnosis of chronic illness.   
+
+```{r rq3ChronicBar, include=T, echo = F, results='html'}
+grid.arrange(rq3$plots$chronicFreqBar, rq3$plots$chronicPropBar, ncol = 2, top = 'Chronic Illness and Reports of One or More Sick Days')
+``` 
+`r figr("rq3ChronicBar", TRUE, type="Figure")`: Chronic Illness and Reports of Health-Related Restricted Activity
+
+```{r rq3ChronicBox, include=T, echo = F, results='html'}
+grid.arrange(rq3$plots$chronicViolin, rq3$plots$chronicBox, ncol = 2, top = "Distribution Summary of Reports of Sick Days by Diagnosis of Chronic Illness")
+``` 
+`r figr("rq3ChronicBox", TRUE, type="Figure")`: Distribution Summary of Reports of Sick Days by Diagnosis of Chronic Illness
+
+The violin and box plots in `r figr("rq3ChronicBox", TRUE, type="Figure")` show two different distributions, one characterized by a relatively wide spread, the other centered around its median of zero days. The group reporting chronic illness reported up to ten sick days, 75% of the time; whereas, the other group reported no more than two sick days, 75% of the time. 
+
+```{r rq3ChronicHist1, include=T, echo = F, results='html'}
+rq3$plots$chronicHist1
+``` 
+`r figr("rq3ChronicHist2", TRUE, type="Figure")`: Distribution of Sick Days by Diagnosis of Chronic Illness
+
+As evidenced by `r figr("rq3ChronicBox", TRUE, type="Figure")`, both distributions peak at zero days, in fact, zero days was not only the mean but the mode for this measure. `r figr("rq3ChronicHist1", TRUE, type="Figure")` shows a magnified view of the distribution, created by removing reports of zero days. The group with the diagnoses had consistently higher frequencies of longer bouts of restricted activity. 
+```{r rq3ChronicHist2, include=T, echo = F, results='html'}
+rq3$plots$chronicHist2
+``` 
+`r figr("rq3ChronicHist2", TRUE, type="Figure")`: Distribution of One or More Sick Days by Diagnosis of Chronic Illness
+
+A Mann-Whitney-Wilcoxon test was administered to confirm the assertion that chronic illness was associated with loss productivity. Setting the probability of a type II error at $\alpha$ =.05, the following hypotheses were tested:
+
+$H_0$ The distributions of both populations are equal     
+$H_a$ The distributions of both populations are not equal    
+
+Though the result was significant, $U$ = (`r round(rq3$tests$chronicTest$statistic, 0)`) , p < .001, two-sided with a 95% CI[`r round(rq3$tests$chronicTest$conf.int[1], 6)`, `r round(rq3$tests$chronicTest$conf.int[2], 2)`], the effect size was small, `r round(rq3$tests$chronicEffect$statistic, 2)` (Kolmogorov-Smirnov p < .001).  Nonetheless, the null hypothesis was rejected in favor of the alternative hypothesis. Chronic illness was associated with higher rates of diagnoses of depression.
+
+
+### Depression Chronic Illness and Productivity
+To what degree does depression with co-occurring chronic illness effect productivity, vis-a-vis that of diagnoses of depression or chronic illness separately? Those with both depression and chronic illness diagnoses, had on average, `r round(rq3$stats$interaction$Mean[1] / rq3$stats$interaction$Mean[2] * 100, 1)`% more days of health-related restricted activity, than those that had either depression, or another chronic condition, or had neither. This analysis examines the significance, and effect of concurrent depression and chronic illness on productivity.
+
+`r figr("rq3InteractionFreqTbl", TRUE, type="Table")` and `r figr("rq3InteractionPropTbl", TRUE, type="Table")` outline the frequencies and proportions reporting sick days over the month preceding the survey, by diagnoses of chronic conditions or depression. Of a total of `r sum(rq3$tables$interactionFreqTbl)` respondents, `r round(sum(rq3$tables$interactionFreqTbl[,2]) / sum(rq3$tables$interactionFreqTbl) * 100, 1)`% reported one or more sick days during the month preceding the survey and `r round(sum(rq3$tables$interactionFreqTbl[1,2]) / sum(rq3$tables$interactionFreqTbl[,2]) * 100, 1)`% of that group had diagnoses of both depression and chronic illness.
+
+<center>
+`r figr("rq3InteractionFreqTbl", TRUE, type="Table")`: Frequencies of Reports of Health-Related Restricted Activity, Depression, and Chronic Illness
+```{r rq3InteractionFreqTbl, include=T, echo = F, results='asis'}
+stargazer(format(rq3$tables$interactionFreqTbl, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+``` 
+</center>
+
+<center>
+`r figr("rq3InteractionPropTbl", TRUE, type="Table")`: Proportions of Reports of Health-Related Restricted Activity, Depression, and Chronic Illness
+```{r rq3InteractionPropTbl, include=T, echo = F, results='asis'}
+stargazer(format(rq3$tables$interactionPropTbl, quote = FALSE, justify = "right", big.mark = ","), type = 'html')
+``` 
+</center>
+
+`r figr("rq3Mosaic", TRUE, type="Figure")` illuminates the degree to which the frequencies of reports depart from expected under the independence model. If the null hypothesis of the independence of chronic illness and depression from productivity held, those with chronic illness and depression diagnoses would report fewer sick days and those without a diagnosis of depression, either with or without chronic illness would have reported more sick days.
+
+
+```{r rq3Mosaic, include=T, fig.height=6, fig.width=10, echo = F, results='html'}
+  mosaic(rq3$tables$interactionTbl, shade = TRUE, legend = TRUE,
+         labeling= labeling_border(rot_labels = c(0,0,0,0), 
+                                   varnames = c(TRUE, TRUE),
+                                   gp_labels = gpar(fontsize = 10),
+                                   just_labels = c("left", 
+                                                   "center", 
+                                                   "center", 
+                                                   "right")))
+``` 
+`r figr("rq3Mosaic", TRUE, type="Figure")`: Mosaic plot of depression, chronic illness, and productivity
+
+`r figr("rq3InteractionStats", TRUE, type="Table")` reveals significant differences in mean number of sick days reported by diagnosis. Naturally, those with neither diagnosis reported the lowest number of restricted activity days; however, the number increased `r round((mean(rq3$stats$interaction[3,8]$Mean, rq3$stats$interaction[2,8]$Mean) / rq3$stats$interaction[4,8]$Mean * 100) - 100, 1)`% for those having either a diagnosis of depression or one or more chronic conditions. Those reporting both diagnoses reported, on average, `r round((rq3$stats$interaction[1,8]$Mean / mean(rq3$stats$interaction[2,8]$Mean, rq3$stats$interaction[3,8]$Mean) * 100) - 100, 1)`% more sick days than those having a single diagnosis of either depression or one or more chronic conditions.
+
+`r figr("rq3InteractionStats", TRUE, type="Table")`: Descriptive Statistics of Restricted Activity Days by Chronic Disease and Depression Diagnoses
+```{r rq3InteractionStats, echo = F, message = FALSE, warning=FALSE}
+kable(rq3$stats$interaction) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
+```
+
+
+```{r rq3InteractionBox, include=T, echo = F, results='html'}
+grid.arrange(rq3$plots$interactionViolin, rq3$plots$interactionBox, ncol = 2, top = "Depression and Chronic Illness and Summary of Distribution of Sick Days")
+``` 
+`r figr("rq3InteractionBox", TRUE, type="Figure")`: Distribution Summary of Reports of Sick Days by Diagnosis of Chronic Illness & Depression
+
+`r figr("rq3InteractionBox", TRUE, type="Figure")` shows a slight increase of `r round(rq3$stats$interaction[2,8]$Mean / rq3$stats$interaction[3,8]$Mean * 100, 1)`% for those with diagnoses of chronic illness; however, the mean number of sick days reported jumps another  `r round(rq3$stats$interaction[1,8]$Mean / rq3$stats$interaction[2,8]$Mean * 100, 1)`% for those with both diagnoses.  The upper quartile increases  `r round(rq3$stats$interaction[1,10]$Upper / rq3$stats$interaction[2,10]$Upper * 100, 1)`% to 20 days of the month. 
+
+
+```{r rq3InteractionHist1, include=T, echo = F, results='html'}
+rq3$plots$interactionHist1
+```
+`r figr("rq3InteractionHist1", TRUE, type="Figure")`: Distribution of Sick Days by Diagnosis of Chronic Illness and Depression
+
+The distribution depicted in `r figr("rq3InteractionHist1", TRUE, type="Figure")` is distorted by heavy right skew and the reports of zero sick days.  Removing the reports of zero sick days from the data set exposed the shape of the distribution of reports of one or more days of health-related restricted activity.  
+
+
+```{r rq3InteractionHist2, include=T, echo = F, results='html'}
+rq3$plots$interactionHist2
+```
+`r figr("rq3InteractionHist2", TRUE, type="Figure")`: Distribution of Sick Days by Diagnosis of Chronic Illness and Depression
+
+The white in `r figr("rq3InteractionHist2", TRUE, type="Figure")` represents the reports of those with neither diagnosis and the dark green end of the spectrum symbolizes the reports of those with both diagnoses. The left side is dominated by light colors, representing those without either diagnosis reporting between zero and five sick days during the month preceding the survey.  Moving right, the plot gets darker with increasing reports from those with one or both diagnoses of longer periods of restricted activity. 
+
+`r figr("rq3InteractionPlot", TRUE, type="Figure")` illustrates how the effect of chronic illness on productivity depends upon the occurrence of a diagnosis of depression.  
+
+```{r rq3InteractionPlot, include=T, echo = F, results='html'}
+  interactionPlot <- plot(allEffects(rq3$tests$interactionModel), multiline=TRUE, ci.style="bars")
+```
+`r figr("rq3InteractionPlot", TRUE, type="Figure")`: Interaction between the diagnoses of depression and chronic illness and their effects on productivity.
+
+The red line indicates depression's main effect on sick days, without a diagnosis of chronic illness, whereby going from no to yes results in about five sick days. If, however, there is a diagnosis of chronic illness, the introduction of depression almost doubles its effect on sick days. A Kruskal-Wallis test was conducted to confirm the interactive effects of chronic illness and depression on productivity. With a significance level $\alpha$ = .05, the following hypotheses were tested.  
+
+$H_0$ There is no difference in each group's effect on productivity     
+$H_a$ There is a difference in each group's effect on productivity     
+
+As expected, there were significant differences in the number of sick days among the four scenarios, $X^2$ = `r rq3$tests$interactionTest$statistic`, $p$ < .001, $df$ = `r rq3$tests$interactionTest$parameter`. To determine which scenario had the greatest effect on productivity, several pairwise post hoc Mann-Whitney-Wilcoxon tests were administered at a significance of $\alpha$ = .05, under the following hypotheses.
+
+$H_0$ There is no difference in the number of sick days between those without diagnoses of chronic illness and depression and those with a diagnosis of depression, without concurrent chronic illness    
+$H_0$ There is no difference in the number of sick days between those with a diagnosis of depression, without concurrent chronic illness and those with a diagnosis of chronic illness, without concurrent depression    
+$H_0$ There is no difference in the number of sick days between those with a diagnosis of chronic illness, without concurrent depression and those with both diagnoses    
+$H_a$ There is a difference in the number of sick days between those without diagnoses of chronic illness and depression and those with a diagnosis of depression, without concurrent chronic illness   
+$H_a$ There is a difference in the number of sick days between those with a diagnosis of depression, without concurrent chronic illness and those with a diagnosis of chronic illness, without concurrent depression      
+$H_a$ There is a difference in the number of sick days between those with a diagnosis of chronic illness, without concurrent depression and those with both diagnoses       
+
+The results of the tests are summarized in `r figr("rq3Pairwise", TRUE, type="Table")`.
+
+`r figr("rq3Pairwise", TRUE, type="Table")`: Pairwise Mann-Whitney-Wilcoxon tests of depression and chronic illness on productivity
+```{r rq3Pairwise, echo = F, message = FALSE, warning=FALSE}
+kable(rq3$tests$pairwise) %>% 
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  add_header_above(c(" " = 1, "Group A" = 2, "Group B" = 2, " " = 6))
+```
+The differences in the effect on productivity were significant, $X^2$ from `r min(rq3$tests$pairwise$X2)` to `r max(rq3$tests$pairwise$X2)`, $p$ < .001. As hypothesized, the largest positive effect size and location parameter were between the reports from those with both diagnoses and those with only one. 
+
+Which chronic diseases have the greatest impact on productivity?  The following bar chart depicts the mean number of sick days reported for the 30 days preceding the survey, by condition.
+```{r rq3AllChronicPlot, include=T, echo = F, results='html'}
+  rq3$plots$allChronic
+```
+`r figr("rq3AllChronicPlot", TRUE, type="Figure")`: Sick days during preceding 30 days by chronic condition
+
+Of the ten chronic diseases analyzed, depression had the greatest impact on productivity, reporting `r round(((rq3$stats$allChronic[1,8] / rq3$stats$allChronic[2,8] * 100) - 100), 2)`% more sick days than `r tolower(rq3$stats$allChronic[2,2])`, the second most impacting condition and `r round(((rq3$stats$allChronic[1,8] / mean(rq3$stats$allChronic[2:11,8]) * 100) - 100), 2)`% greater productivity loss than the average of all chronic conditions.
+
+In closing, concurrent depression and chronic illness had a drastic impact on productivity, $X^2$ =  `r rq3$tests$interactionTest$statistic`, $p$ < .001, effect size = `r round(rq3$tests$pairwise[1,11], 2)`. Those with concurrent diagnoses incurred `r round(rq3$stats$interaction$Mean[1] / rq3$stats$interaction$Mean[2] * 100, 1)`% loss in productivity due to health issues.  
+## Research Question #4: Depression, Chronic Illness and Use of health care Services
+Is there a relationship between depression, chronic illness and the use of health care services? Marginally speaking, those with a diagnosis of depression visited the doctor `r round((rq4$stats$depression$Mean[1] / rq4$stats$depression$Mean[2] * 100) - 100, 1)`% more often than those without a diagnosis. The average marginal effect of a diagnosis of chronic illness was `r round((rq4$stats$chronic$Mean[1] / rq4$stats$chronic$Mean[2] * 100) - 100, 1)`% on the number of doctor visits. The greatest effect was observed among those with diagnoses of both depression and chronic illness. This group visited the doctor `r round((rq4$stats$interaction[1,8]$Mean / mean(rq4$stats$interaction[2,8]$Mean, rq4$stats$interaction[3,8]$Mean) * 100) - 100, 1)`% more often than those with a single diagnosis of either depression or one or more chronic conditions.    
+
+### Depression and Use health care Services
+First, the marginal effects of depression diagnoses on the use of health care services are investigated. As shown in `r figr("rq4DepressionStats", TRUE, type="Table")` those with depression diagnoses reported, on average `r round((rq4$stats$depression$Mean[1] / rq4$stats$depression$Mean[2] * 100) - 100, 1)`% greater number of Dr. visits in the 12 months preceding the survey, than those without a diagnosis of depression. As the data were significantly right-skewed, the median number of Dr. visits for those with a depression diagnosis was `r round((rq4$stats$depression$Median[1] / rq4$stats$depression$Median[2] * 100) - 100, 1)`% greater. 
+
+`r figr("rq4DepressionStats", TRUE, type="Table")`: Descriptive Statistics of effect of depression on the number of Dr. visits in 12 month period
+```{r rq4DepressionStats, echo = F, message = FALSE, warning=FALSE}
+kable(rq4$stats$depression) %>% 
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
+```
+`r figr("rq4DepressionBox", TRUE, type="Figure")` graphically displays the two distributions quantitatively described above. The group with depression diagnoses had a higher number of reports of five or more Dr. visits in the year preceding the survey. The reports of Dr. visits among those without a diagnosis had a lower and wider center $Med$ = `r rq4$stats$depression$Median[2]`, $\bar{x}$ = `r rq4$stats$depression$Mean[2]`.
+
+```{r rq4DepressionBox, include=T, echo = F, results='html'}
+grid.arrange(rq4$plots$depressionViolin, rq4$plots$depressionBox, ncol = 2, top = "Depression and Summary Distribution of Dr. Visits")
+```
+`r figr("rq4DepressionBox", TRUE, type="Figure")`: Depression and summary of distribution of Dr. visits
+
+The histogram echos the results from the box plot and adds greater detail of the distribution of reports of five visits or more.  In `r figr("rq4DepressionHist1", TRUE, type="Figure")`, the group with diagnoses of depression reported five Dr. visits or more, as frequently or more frequently than those without a diagnosis (`r figr("rq4DepressionHist2", TRUE, type="Figure")`). 
+
+```{r rq4DepressionHist1, include=T, echo = F, results='html'}
+rq4$plots$depressionHist1
+```
+`r figr("rq4DepressionHist1", TRUE, type="Figure")`: Distribution of Dr. Visits by Diagnosis of Depression
+
+```{r rq4DepressionHist2, include=T, echo = F, results='html'}
+rq4$plots$depressionHist2
+```
+`r figr("rq4DepressionHist2", TRUE, type="Figure")`: Distribution of five or more Dr. Visits by Diagnosis of Depression
+
+Given the skewness in the data, the non-parametric Mann-Whitney-Wilcoxon test was administered with a significance of $\alpha$ =.05 to determine whether those with a diagnosis of depression visited the Dr. more frequently than those without a diagnosis. The hypotheses were as follows:
+
+$H_0$ Depression has no effect on the number of Dr. Visits between the groups.   
+$H_a$ Depression has an effect on the number of Dr. Visits between the groups.   
+
+The test indicated that those with depression visited the Dr. more frequently (Mdn = `r rq4$stats$depression$Median[1]`), than those without a diagnosis (Mdn = `r rq4$stats$depression$Median[2]`), $U$ = `r rq4$tests$depressionTest$statistic`, $p$ < .001, $r$ = `r round(rq4$tests$depressionEffect$statistic, 3)`.
+
+### Chronic Illness and Use health care Services
+Considering the marginal effects of diagnoses of one or more chronic conditions, `r figr("rq4ChronicStats", TRUE, type="Table")` shows that those with chronic illness diagnoses reported, on average `r round((rq4$stats$chronic$Mean[1] / rq4$stats$chronic$Mean[2] * 100) - 100, 1)`% greater number of Dr. visits in the 12 months preceding the survey. The median number of Dr. visits for those with a chronic illness diagnosis was `r rq4$stats$chronic$Median[1]` versus those without a diagnosis, `r rq4$stats$chronic$Median[2]`, a `r round((rq4$stats$chronic$Median[1] / rq4$stats$chronic$Median[2] * 100) - 100, 1)`% difference. 
+
+`r figr("rq4ChronicStats", TRUE, type="Table")`: Descriptive Statistics of effect of chronic illness on the number of Dr. visits in a 12 month period
+```{r rq4ChronicStats, echo = F, message = FALSE, warning=FALSE}
+kable(rq4$stats$chronic) %>% 
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") 
+```
+As indicated in `r figr("rq4ChronicBox", TRUE, type="Figure")`, the group with chronic illness diagnoses had a higher number of reports of five or more Dr. visits in the year preceding the survey. The reports of Dr. visits among those without a diagnosis had a lower and wider center of around `r rq4$stats$chronic$Median[2]` visits for the year.
+
+
+```{r rq4ChronicBox, include=T, echo = F, results='html'}
+grid.arrange(rq4$plots$chronicViolin, rq4$plots$chronicBox, ncol = 2, top = "Chronic Illness and Summary Distribution of Dr. Visits")
+```
+`r figr("rq4ChronicBox", TRUE, type="Figure")`: Chronic Illness and Summary of Distribution of Dr. Visits
+
+`r figr("rq4ChronicHist1", TRUE, type="Figure")`, visually represents the quantitative results above. The group with diagnoses of chronic illness reported five or more Dr. visits,  as frequently or more frequently than those without a diagnosis (`r figr("rq4ChronicHist2", TRUE, type="Figure")`). 
+
+```{r rq4ChronicHist1, include=T, echo = F, results='html'}
+rq4$plots$chronicHist1
+```
+`r figr("rq4ChronicHist1", TRUE, type="Figure")`: Distribution of Dr. Visits by Diagnosis of Chronic Illness
+
+```{r rq4ChronicHist2, include=T, echo = F, results='html'}
+rq4$plots$chronicHist2
+```
+`r figr("rq4ChronicHist2", TRUE, type="Figure")`: Distribution of five or more Dr. Visits by Diagnosis of Chronic Illness
+
+Mann-Whitney-Wilcoxon test was administered with a significance of $\alpha$ =.05 to determine whether those with a diagnosis of chronic illness visited the Dr. more frequently than those without a diagnosis. The hypotheses were as follows:
+
+$H_0$ Chronic Illness has no effect on the number of Dr. Visits.   
+$H_a$ Chronic Illness has an effect on the number of Dr. Visits.    
+
+The test indicated that those with chronic illness visited the Dr. more frequently (Mdn = `r rq4$stats$chronic$Median[1]`), than those without a diagnosis (Mdn = `r rq4$stats$chronic$Median[2]`), $U$ = `r rq4$tests$chronicTest$statistic`, $p$ < .001, $r$ = `r round(rq4$tests$chronicEffect$statistic, 3)`. 
+
+### The Effect of Depression and Chronic Illness on the Use of Health Services
+`r figr("rq4InteractionStats", TRUE, type="Table")` reveals significant differences in mean number of Dr. visits reported by diagnosis scenario. Naturally, those with neither diagnosis reported the lowest number of Dr. visits; however, the number increased approximately `r round((mean(rq4$stats$interaction[3,8]$Mean, rq4$stats$interaction[2,8]$Mean) / rq4$stats$interaction[4,8]$Mean * 100) - 100, 1)`% for those having either a diagnosis of depression or a diagnosis of one or more chronic conditions. Those having both diagnoses visited the doctor `r round((rq4$stats$interaction[1,8]$Mean / mean(rq4$stats$interaction[3,8]$Mean, rq4$stats$interaction[2,8]$Mean) * 100) - 100, 1)`% more often than those with either a diagnosis of depression, or one or more chronic conditions.
+
+`r figr("rq4InteractionStats", TRUE, type="Table")`: Descriptive Statistics of Dr. Visits by Chronic Disease and Depression Diagnoses
+```{r rq4InteractionStats, echo = F, message = FALSE, warning=FALSE}
+kable(rq4$stats$interaction) %>%  
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center")
+```
+
+
+```{r rq4InteractionBox, include=T, echo = F, results='html'}
+grid.arrange(rq4$plots$interactionViolin, rq4$plots$interactionBox, ncol = 2, top = "Depression and Chronic Illness and Summary of Distribution of Dr. Visits")
+``` 
+`r figr("rq4InteractionBox", TRUE, type="Figure")`: Distribution Summary of Reports of Dr. Visits by Diagnosis of Chronic Illness & Depression
+
+As shown in `r figr("rq4InteractionBox", TRUE, type="Figure")` those with a diagnosis of depression, without concurrent chronic illness, visited the doctor  `r round((rq4$stats$interaction[3,8]$Mean / rq4$stats$interaction[4,8]$Mean * 100) - 100, 1)`% more frequently than those without either diagnosis. There was a slight increase of  `r round((rq4$stats$interaction[2,8]$Mean / rq4$stats$interaction[3,8]$Mean * 100) - 100, 1)`% among those with a diagnosis of chronic illness, without concurrent depression; however, those with both diagnoses visited the doctor `r round((rq4$stats$interaction[1,8]$Mean / mean(rq4$stats$interaction[2,8]$Mean, rq4$stats$interaction[2,8]$Mean) * 100) - 100, 1)`% more frequently than those with a diagnosis of depression, or chronic illness, but not both. The upper quartile increases  `r round((rq4$stats$interaction[1,10]$Upper / rq4$stats$interaction[2,10]$Upper * 100) - 100, 1)`% from `r rq4$stats$interaction[2,10]$Upper` to `r rq4$stats$interaction[1,10]$Upper` visits a month. 
+
+```{r rq4InteractionHist1, include=T, echo = F, results='html'}
+rq4$plots$interactionHist1
+```
+`r figr("rq4InteractionHist1", TRUE, type="Figure")`: Distribution of Dr. Visits by Diagnosis of Chronic Illness and Depression
+
+The distribution depicted in `r figr("rq4InteractionHist1", TRUE, type="Figure")` is distorted by the heavy right skew and numbers reporting Dr. visits.  Removing the reports of zero Dr. visits from the data set reveals the shape of the distribution of reports of one or more Dr. visits.  
+
+```{r rq4InteractionHist2, include=T, echo = F, results='html'}
+rq4$plots$interactionHist2
+```
+`r figr("rq4InteractionHist2", TRUE, type="Figure")`: Distribution of Dr. Visits by Diagnosis of Chronic Illness and Depression
+
+The white in `r figr("rq4InteractionHist2", TRUE, type="Figure")` represents the reports of those with neither diagnosis and the dark green end of the spectrum symbolizes the reports of those with both diagnoses. The left side is dominated by light colors, representing the reports of doctors visits among those with neither diagnosis, or just one. Moving right, the graph grows darker with reports of higher numbers of doctor visits among those with one, or both diagnoses.
+
+ `r figr("rq4InteractionPlot", TRUE, type="Figure")` illustrates how the effect of chronic illness on doctor visits varies with depression.
+
+```{r rq4InteractionPlot, include=T, echo = F, results='html'}
+  interactionPlot <- plot(allEffects(rq4$tests$interactionModel), multiline=TRUE, ci.style="bars")
+```
+`r figr("rq4InteractionPlot", TRUE, type="Figure")`: Effect of chronic illness on user of health services, with and without concurrent depression
+
+In `r figr("rq4InteractionPlot", TRUE, type="Figure")`, the red line indicates depression's main effect on the number of Dr. visits, without a diagnosis of chronic illness, whereby going from no to yes results in about 5 an 1/2 Dr. visits. If, however, there is a diagnosis of chronic illness, the introduction of depression almost doubles the effect on the number of Dr. visits. A Kruskal-Wallis test was conducted to confirm the interactive effects of chronic illness and depression on the use of health services. With a significance level $\alpha$ = .05, the following hypotheses were tested.  
+
+$H_0$ The effect of chronic illness on the use of health services is not affected by the presence of depression
+$H_a$ The effect of chronic illness on the use of health services is affected by the presence of depression
+
+As expected, there was a significant difference in the number of Dr. visits among the four scenarios, $X^2$ = `r rq4$tests$interactionTest$statistic`, $p$ < .001, $df$ = `r rq4$tests$interactionTest$parameter`. To determine which scenario had the greatest effect on use of health services, several pairwise post hoc Mann-Whitney-Wilcoxon tests were administered at a significance of $\alpha$ =.05, under the following hypotheses.
+
+$H_0$ There is no difference in the number of doctor visits between those without diagnoses of chronic illness and depression and those with a diagnosis of depression, without concurrent chronic illness   
+$H_0$ There is no difference in the number of doctor visits between those with a diagnosis of depression, without concurrent chronic illness and those with a diagnosis of chronic illness, without concurrent depression    
+$H_0$ There is no difference in the number of doctor visits between those with a diagnosis of chronic illness, without concurrent depression and those with both diagnoses    
+$H_a$ There is a difference in the number of doctor visits between those without diagnoses of chronic illness and depression and those with a diagnosis of depression, without concurrent chronic illness    
+$H_a$ There is a difference in the number of doctor visits between those with a diagnosis of depression, without concurrent chronic illness and those with a diagnosis of chronic illness, without concurrent depression     
+$H_a$ There is a difference in the number of doctor visits between those with a diagnosis of chronic illness, without concurrent depression and those with both diagnoses     
+
+The results of the tests are summarized in `r figr("rq4Pairwise", TRUE, type="Table")`.
+
+`r figr("rq4Pairwise", TRUE, type="Table")`: Pairwise Mann-Whitney-Wilcoxon tests of depression and chronic illness on use of health services
+```{r rq4Pairwise, echo = F, message = FALSE, warning=FALSE}
+kable(rq4$tests$pairwise) %>% 
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"), full_width = F, position = "center") %>%
+  add_header_above(c(" " = 1, "Group A" = 2, "Group B" = 2, " " = 6))
+```
+
+The differences in the effect on use of health services were significant, $X^2$ ranging from `r min(rq4$tests$pairwise$X2)` to `r max(rq4$tests$pairwise$X2)`, $p$ < .001. As hypothesized, the largest positive effect size and location parameter were between the reports from those with both diagnoses and those with only one. 
+
+Which chronic diseases have the greatest impact on the use of health care services?  The following bar chart depicts the mean number of doctor visits during the 12 months preceding the survey, by condition.
+```{r rq4AllChronicPlot, include=T, echo = F, results='html'}
+  rq4$plots$allChronic
+```
+`r figr(" rq4AllChronicPlot", TRUE, type="Figure")`: Dr. visits during previous 12 months, by chronic condition
+
+Of the ten chronic diseases reported, depression was second to kidney disease in reports of doctor visits. 
+
+In closing, concurrent depression and chronic illness had a drastic impact on use of health services, $X^2$ = `r rq4$tests$pairwise[1,6]`, $p$ < .001, effect size = `r round(rq4$tests$pairwise[1,11], 2)`. Those with concurrent diagnoses used health care services `r round((rq4$stats$interaction$Mean[1] / mean(rq4$stats$interaction$Mean[2], rq4$stats$interaction$Mean[3]) * 100) - 100, 1)`% more often than those with a single diagnosis of either depression, or one or more chronic illnesses, and `r round((rq4$stats$interaction$Mean[1] / rq4$stats$interaction$Mean[4] * 100) - 100, 0)`% more often than those without diagnoses of chronic illness or depression.
+
+# Discussion
+
+## Depression Sociodemographics
+Depression, as this analysis shows, affects those across the socioeconomic spectrum, leading to loss of productivity and increased use of health care services. Using income and education as a proxies for socioeconomic status, this analysis tends to align with the hypothesis in literature, namely that higher rates of depression are associated with the lower socioeconomic strata. In fact, the data support an inverse, linear marginal relationship between income and rates of depression. Higher rates of depression were discovered among those without a high-school education, and the lowest rates were found among those that had completed college or technical school; however, the relationship departs from linear as those with some college or technical school had lower rates of depression than high school graduates. Considering income and education together, the highest rates of depression were among those who attended college, at all levels of income. The lowest rates of depression were among high school graduates at all compensation levels. However, the direction of the socioeconomic cause-effect relationship; is not clear. Are higher rates of depression caused by economic stresses or does depression-related loss of productivity lead to a deficit of economic and educational potential? Future studies which include interventions and treatments over time might illuminate the socioeconomic dimensions of depression. 
+
+## Depression and Chronic Disease
+Diagnoses of depression have been shown to occur among 73% of those who also reported a diagnosis of one or more chronic conditions in their past. Since the survey questions were aimed at determining whether a diagnosis had ever occurred in the respondent's past, this analysis was not able to discern whether the respondent was currently being treated for depression, whether those interventions were successful, or the degree to which the respondent was currently suffering from any other chronic condition or conditions.  That said,  only 52% of those without a diagnosis of one or more chronic conditions reported a prior diagnosis of depression. Again, a diagnosis of depression may be the manifestation of separate genetic or neurological processes or that of a cause-effect relationship between diagnoses of depression and chronic illness.  This question is out of the scope of this analysis; however, future time-based studies which include interventions may shed some light on the nature of the relationship between depression and chronic illness.
+
+## Depression and Productivity
+Depression had a slightly greater marginal effect on productivity, than did chronic illness. Fifty-eight percent of those reporting a diagnosis of chronic disease also reported depression. Moreover, those that indicated both diagnoses reported on average `r round((rq3$stats$interaction$Mean[1] / rq3$stats$interaction$Mean[4] * 100) - 100,0)`% more sick days (`r rq3$stats$interaction$Mean[1]` days) than those without any diagnosis of depression or chronic illness (`r rq3$stats$interaction$Mean[4]` days) and `r round((rq3$stats$interaction$Mean[1] / mean(rq3$stats$interaction$Mean[2],rq3$stats$interaction$Mean[3])* 100) - 100,1)`% greater than those with a diagnosis of depression or chronic illness, but not both (~`r mean(rq3$stats$interaction$Mean[2],rq3$stats$interaction$Mean[3])` days).  Clearly, those with  co-occurring diagnoses of depression and chronic illness suffer significantly greater loss of productivity. Studies such as [@Egede2007] that illuminate the co-occurring relationships between depression, chronic illness and loss of productivity have and will continue to inform practices and policies aimed at reducing the personal and societal loss in productivity.
+
+## Depression and Use of health care Services
+Depression also had a slightly greater marginal effect on the use of health care services, than did chronic illness. Those with a diagnosis of depression had on average `r round((rq4$stats$depression$Mean[1] / rq4$stats$chronic$Mean[1] * 100) -100, 1)`% more doctors visits during the 12 months preceding the survey, than those with a diagnosis of one or more chronic illnesses (`r format(rq4$stats$depression$Mean[1],nsmall = 2)` vs. `r round(rq4$stats$chronic$Mean[1],2)`), second only to those with a diagnosis of kidney disease. Two reasons may account for this difference.  First, kidney dialysis is a non-negotiable aspect of treatment for some with kidney disease. Second, this study didn't control for access to health services via insurance; therefore, those with depression and no insurance may report less frequent use of health services.  Those with diagnoses of depression, with chronic illness reported on average `r round((rq4$stats$interaction$Mean[1] / rq4$stats$interaction$Mean[4] * 100) - 100,0)`% more doctors visits (`r rq4$stats$interaction$Mean[1]` visits) than those without any diagnosis of depression or chronic illness (`r rq4$stats$interaction$Mean[4]` visits) and `r round((rq4$stats$interaction$Mean[1] / mean(rq4$stats$interaction$Mean[2],rq4$stats$interaction$Mean[3])* 100) - 100,1)`% greater than those with a diagnosis of depression or chronic illness, but not both (~`r mean(rq4$stats$interaction$Mean[2],rq4$stats$interaction$Mean[3])` visits).  Like productivity, the use of health care services increased dramatically for those with co-occurring depression and chronic disease. Studies such as [@Egede2007] and [Katon2002] illuminate the co-occurring relationships between depression, chronic illness and health care utilization.
+
+# Conclusion
+Depression is **the** most debilitating of the chronic diseases in the United States. The estimated 18.2 percent of Americans[@Bekiempis2014a] (`r round(univariate$depression$table[1,3]$Pct, 1)`% of the survey respondents) incur `r round(((rq3$stats$interaction[1,8]$Mean / mean(rq3$stats$allChronic$Mean) * 100) - 100), 1)`% greater loss in productivity than the average person across all chronic diseases and `r round(((rq3$stats$interaction[1,8]$Mean / mean(rq3$stats$interaction[4,8]$Mean) * 100) - 100), 1)`% higher loss in productivity than the general public. The marginal effects of depression on the use of health care services are substantial as well. Sufferers visit the doctor's office `r round((rq4$stats$allChronic[2,8] / mean(rq4$stats$allChronic[3,8], rq4$stats$allChronic[4,8], rq4$stats$allChronic[5,8], rq4$stats$allChronic[6,8], rq4$stats$allChronic[7,8], rq4$stats$allChronic[8,8], rq4$stats$allChronic[9,8], rq4$stats$allChronic[10,8], rq4$stats$allChronic[11,8]) * 100) - 100,1)`% more frequently, on average, than those with other chronic diseases. This ranks depression second in use of health care services to kidney disease. 
+
+Arguably however, the joint effects of depression and chronic illness are utmost. In short, the average number of sick days for those with a diagnosis of at least one chronic condition was `r rq3$stats$chronic[1,8]$Mean`. Add depression and the number of sick days increased by `r round((rq3$stats$interaction[1,8]$Mean / rq3$stats$chronic[1,8]$Mean * 100) - 100, 1)`% to `r round(rq3$stats$interaction[1,8]$Mean, 1)` days in a 30 day period. Considering the use of health care services, those with a diagnosis of one or several chronic conditions visited the doctor `r rq4$stats$chronic[1,8]$Mean` times during a 12 month period.  On the other hand, the number of annual doctor visits for those with co-occurring diagnoses of depression and chronic disease increased by `r round((rq3$stats$interaction[1,8]$Mean / mean(rq3$stats$interaction[2,8]$Mean,rq3$stats$interaction[3,8]$Mean) * 100) - 100,1)`% to `r rq3$stats$interaction[1,8]$Mean` visits.
+
+Clearly, depression is a source of significant losses in productivity and substantial increases in health care spending. According to the World Health Organization, depression is **the** leading cause of disability worldwide [@WHO2012] and carries the heaviest burden of disability among adults age 15 to 44 in the United States [@Health2010]. Moreover, available literature sets its annual societal cost at $210 billion in direct and indirect medical expenditures and lost productivity [@Greenberg2015].  Future studies that further illuminate and isolate the causes of depression vis-a-vis chronic illness will spawn better treatments and lead to more intelligent health care policies that reduce health care spending and the societal and personal costs of millions.
+
+# References

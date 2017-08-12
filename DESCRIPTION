@@ -1,11 +1,39 @@
 Package: chronic
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Chronic Illness & Depression: Prevalence, Comorbidity and Costs
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
+Authors@: person("John", "James", email = "j2sdatalab@gmail.com",
+                  role = c("aut", "cre"))
+Maintainer: Maintainer: John James <jjames@analyticsalon.com>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+License: MIT
 Encoding: UTF-8
 LazyData: true
+Depends:
+    R (>= 3.4.1),
+    data.table,
+    dplyr
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
+Imports:
+    effects,
+    effsize,
+    extrafont,
+    ggplot2,
+    ggthemes,
+    gridExtra,
+    kfigr,
+    pastecs,
+    printr,
+    psych,
+    pwr,
+    RColorBrewer,
+    reshape2,
+    stargazer,
+    stringr,
+    vcd,
+    vcdExtra,
+    xtable
+RoxygenNote: 6.0.1

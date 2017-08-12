@@ -1,0 +1,12 @@
+.col2 {
+    -webkit-columns: 2 200px; /* chrome, safari */
+    -moz-columns: 2 200px;    /* firefox */
+    columns: 2 200px;         /* number of columns and width in pixels*/
+}
+.col3 {
+    -webkit-columns: 3 100px;
+    -moz-columns: 3 100px;
+    columns: 3 100px;
+
+}
+
