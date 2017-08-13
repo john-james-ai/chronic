@@ -1,12 +1,32 @@
 Package: chronic
 Type: Package
-Title: Chronic Illness & Depression: Prevalence, Comorbidity and Costs
+Title: Clinical Depression: Prevalence, SocioDemographic, Chronic Disease Comorbidity, and Costs
 Version: 0.1.0
-Authors@: person("John", "James", email = "j2sdatalab@gmail.com",
+Authors@: person("John", "James", email = "jjames@datasciencesalon.org",
                   role = c("aut", "cre"))
-Maintainer: Maintainer: John James <jjames@analyticsalon.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Maintainer: Maintainer: John James <jjames@datasciencesalon.org>
+Description: A statistical analysis of depression in the United States, 
+    its prevalence, sociodemographics, comorbidity with other chronic illnesses,
+    and its costs. The data source for this project was the Centers for 
+    Disease Control and Prevention's 2013 Behavioral Risk
+    Factor Surveillance System (BRFSS) Survey, a national, state-based
+    cross-sectional telephone survey of over 500,000 American respondents,
+    capturing and documenting health practices and behavioral factors
+    such as tobacco use, HIV/AIDS knowledge and prevention, exercise, 
+    immunization, health status, healthy days — health-related quality of 
+    life, health care access, inadequate sleep, hypertension awareness, 
+    cholesterol awareness, chronic health conditions, alcohol consumption, 
+    fruits and vegetables consumption, arthritis burden, and seatbelt use.
+    The aim of the analysis was to engage four questions: (1) is there 
+    a relationship between socioeconomic status and depression, (2) to 
+    what degree does depression co-occur with other chronic conditions 
+    such as heart disease, diabetes, asthma, kidney disease, asthma and 
+    other lung diseases, (3) what are the marginal, conditional, and joint 
+    effects of depression on productivity vis-a-vis those of other 
+    chronic illnesses and (4) how does depression affect costs in 
+    terms of health service utilization, compared to other chronic 
+    disorders. 
+    
 License: MIT
 Encoding: UTF-8
 LazyData: TRUE
