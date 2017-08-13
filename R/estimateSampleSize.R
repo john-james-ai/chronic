@@ -17,7 +17,7 @@
 #' @param sigLevel Numeric variable indicating the level of significance
 #' @param powerLevel Numeric indicator of the power level
 #' @return power Data frame indicating minimum sample sizes for various statistical tests
-#' @author John James, \email{jjames@@datasciencestudio.org}
+#' @author John James, \email{jjames@@datasciencesalon.org}
 #' @export
 estimateSampleSize <- function(effect = 0.1, sigLevel = 0.05, powerLevel = 0.8) {
   x2Income <- pwr::pwr.chisq.test(w = effect, sig.level = sigLevel, power = powerLevel, df = 4)

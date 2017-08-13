@@ -3,14 +3,36 @@
 #==============================================================================#
 #' analyzeUnivariate
 #'
-#'  \code{analyzeUnivariate}
+#'  \code{analyzeUnivariate}{Univariate analysis of independent and dependent variables}
 #'
 #' This function performs the univariate analysis of categorical and quantitative
-#' variables.
+#' independent and response variables in the following seven functions.
+#' \itemize{
+#'  \item{analyzeDepression}{Summarizes the distribution of valid responses, conducts a z-test of proportions, and renders a frequency and proportion bar plot }
+#'  \item{analyzeChronic}{Summarizes the distribution of valid responses, conducts a z-test of proportions, and renders a frequency and proportion bar plot }
+#'  \item{analyzeIncome}{Summarizes the distribution of valid responses, conducts a z-test of proportions, and renders a frequency and proportion bar plot }
+#'  \item{analyzeEducation}{Summarizes the distribution of valid responses, conducts a z-test of proportions, and renders a frequency and proportion bar plot }
+#'  \item{analyzeSickDaysRange}{Summarizes the ranges of sick days reported and plots the day range data. }
+#'  \item{analyzeSickDays}{Summarizes the distribution of sick days, plots histograms and returns descriptive statistics }
+#'  \item{analyzeVisits}{Summarizes the distribution of Dr. visits, plots histograms and returns descriptive statistics }
+#' }
+#'
 #'
 #' @param brfss Data frame of preprocessed 2013 Behavioral Risk Factor Surveillance System (BRFSS) data
-#' @return univariate List of analyses for categorical and quantitative variables
-#' @author John James, \email{jjames@@datasciencestudio.org}
+#'
+#' @return univariate List of analyses for categorical and quantitative variables as follows:
+#' \itemize{
+#'  \item{depression}{Univariate analysis of depression diagnosis variable}
+#'  \item{sickDays}{Univariate analysis of sick days variable}
+#'  \item{sickDaysRange}{Univariate analysis of sick days range variable}
+#'  \item{income}{Univariate analysis of income variable}
+#'  \item{education}{Univariate analysis of education variable}
+#'  \item{chronic}{Univariate analysis of chronic disease diagnosis variable}
+#'  \item{categorical}{Summary of univariate analysis of categorical variables}
+#'  \item{quantitative}{Summary of univariate analysis of quantitative variables}
+#' }
+#'
+#' @author John James, \email{jjames@@datasciencesalon.org}
 #' @export
 analyzeUnivariate <- function(brfss) {
 

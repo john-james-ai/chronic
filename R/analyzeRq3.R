@@ -4,17 +4,103 @@
 #'
 #' analyzeRq3
 #'
-#' \code{analyzeRq3(brfss)}{Performs analyses for research question #3}
+#' \code{analyzeRq3(brfss)}{Performs analyses for research question #3,
+#' To what degree does depression with co-occurring chronic illness affect
+#' productivity, vis-a-vis that of diagnoses of depression or chronic illness
+#' separately?}
 #'
-#' Function that performs the analysis for research question #3:  To what
-#' degree does depression with co-occurring chronic illness affect productivity,
-#' vis-a-vis that of diagnoses of depression or chronic illness separately?
+#' This function analyzes the effects of depression and chronic illness on the
+#' response variable,  the number of sick days reported in the 30 days
+#' preceding the survey.  This analysis is conducted in the following five
+#' sections.
+#'
+#' @section Acquire Data:
+#' This section extracts the number of sick days and the sick days range
+#' variable, as well as the depression and chronic illnesses indicator
+#' variables.
+#'
+#' @section Create Marginal and Joint Contingency Tables:
+#' This section renders the tables that illuminate the marginal and joint
+#' effects of depression and chronic illness on the number of sick days
+#' reported.  Descriptive statistics of sick days are also reported
+#' for both depression and chronic illness, as well as their joint
+#' effects on the number of sick days reported.
+#'
+#' @section Plots:
+#' In this section, frequency and proportion bar plots, box plots, violin
+#' plots and histograms are rendered to illuminate the distribution of
+#' sick days vis-a-vis chronic illness and depression diagnoses.
+#'
+#' @section Statistical Tests:
+#' In this section, the non-parametric Wilcoxin signed-rank and the
+#' the Kolmogorov–Smirnov tests were administered to ascertain the
+#' effect of depression and chronic illness on the number of sick days
+#' reported.  The Wilcox test compared the mean number of sick days
+#' reported for both depression and chronic disease diagnoses for
+#' statistically significant differences.  The Komogorov-Smirnov tests
+#' were conducted pairwise to reveal relative effects of depression
+#' and chronic illness on sick days reported.
 #'
 #' @param brfss Data frame of preprocessed 2013 Behavioral Risk Factor
 #' Surveillance System (BRFSS) telephone survey.
+#'
 #' @return analysis List containing frequency and proportion data, plots,
-#'     and statistical tests.
-#' @author John James, \email{jjames@@datasciencestudio.org}
+#'     and statistical tests. The variables are as follows:
+#'     \itemize{
+#'      \itemize{Data Tables}{
+#'       \item{depressionFreqTbl}{Table of frequencies of depression diagnoses}
+#'       \item{depressionPropTbl}{Table of proportions of depression diagnoses}
+#'       \item{chronicFreqTbl}{Table of frequencies of chronic disease diagnoses}
+#'       \item{chronicPropTbl}{Table of proportions of chronic disease diagnoses}
+#'       \item{interactionFreqTbl}{Table of frequencies of the interaction between chronic illness and depression diagnoses}
+#'       \item{interactionPropTbl}{Table of proportions of the interaction between chronic illness and depression diagnoses}
+#'      }
+#'      \itemize{Data Frames}{
+#'       \item{depressionData}{Depression frequency data in data frame format}
+#'       \item{chronicData}{Chronic disease frequency data in data frame format}
+#'       \item{interactionData}{Interaction between depression and chronic illness frequency data in data frame format}
+#'     }
+#'     \itemize{Statistics}{
+#'      \item{depression}{Descriptive statistics for sick days vis-a-vis depression diagnoses}
+#'      \item{chronic}{Descriptive statistics for sick days vis-a-vis chronic illness diagnoses}
+#'      \item{interaction}{Descriptive statistics for sick days vis-a-vis the depression / chronic illness interaction variable}
+#'      \item{allChronic}{Descriptive statistics for sick days vis-a-vis a diagnoses of any chronic illness}
+#'     }
+#'     \itemize{Plots}{
+#'      \item{depressionFreqBar}{The depression frequency bar plot}
+#'      \item{depressionPropBar}{The depression proportion bar plot}
+#'      \item{depressionHist1}{A histogram of the distribution of sick days vis-a-vis a diagnosis of depression}
+#'      \item{depressionHist2}{A histogram of the distribution of one or more sick days reported vis-a-vis a diagnosis of depression}
+#'      \item{depressionViolin}{A violin plot of the distribution of sick days vis-a-vis a diagnosis of depression}
+#'      \item{depressionBox}{A box plot of the distribution of sick days vis-a-vis a diagnosis of depression}
+#'      \item{chronicFreqBar}{The chronic illness diagnosis frequency bar plot}
+#'      \item{chronicPropBar}{The chronic illness diagnosis proportion bar plot}
+#'      \item{chronicHist1}{A histogram of the distribution of sick days vis-a-vis a diagnosis of chronic illness}
+#'      \item{chronicHist2}{A histogram of the distribution of one or more sick days reported vis-a-vis a diagnosis of chronic illness}
+#'      \item{chronicViolin}{A violin plot of the distribution of sick days vis-a-vis a diagnosis of chronic illness}
+#'      \item{chronicBox}{A box plot of the distribution of sick days vis-a-vis a diagnosis of chronic illness}
+#'      \item{allChronic}{A box plot of the distribution of sick days vis-a-vis a diagnosis of of any chronic illness}
+#'      \item{interactionFreqBar}{The depression / chronic illness interaction variable frequency bar plot of sick }
+#'      \item{interactionPropBar}{The depression / chronic illness interaction variable proportion bar plot}
+#'      \item{interactionHist1}{A histogram of the distribution of sick days vis-a-vis the depression / chronic illness interaction variable}
+#'      \item{interactionHist2}{A histogram of the distribution of one or more sick days reported vis-a-vis the depression / chronic illness interaction variable}
+#'      \item{interactionViolin}{A violin plot of the distribution of sick days vis-a-vis the depression / chronic illness interaction variable}
+#'      \item{interactionBox}{A box plot of the distribution of sick days vis-a-vis the depression / chronic illness interaction variable}
+#'      \item{allinteraction}{A box plot of the distribution of sick days vis-a-vis the depression / chronic illness interaction variable}
+#'     }
+#'     \itemize{tests}{
+#'      \item{depressionTest}{The Wilcoxin ranked-sums test of equal means with and without depression}
+#'      \item{depressionEffect}{The Kolmogorov-Smirnov test of the effect of depression on sick days reported}
+#'      \item{chronicTest}{The Wilcoxin ranked-sums test of equal means with and without a diagnosis of chronic illness}
+#'      \item{chronicEffect}{The Kolmogorov-Smirnov test of the effect of chronic illness on sick days reported}
+#'      \item{interactionTest}{The Wilcoxin ranked-sums test of equal means vis-a-vis the depression / chronic illness interaction variable}
+#'      \item{interactionModel}{The linear model that relates sick days to the values of the interaction variable}
+#'      \item{pairwise}{The pairwise Kolmogorov-Smirnov test of the effect of depression and chronic illness on sick days reported}
+#'     }
+#'  }
+#'
+#'
+#' @author John James, \email{jjames@@datasciencesalon.org}
 #' @export
 analyzeRq3 <- function(brfss) {
   #---------------------------------------------------------------------------#

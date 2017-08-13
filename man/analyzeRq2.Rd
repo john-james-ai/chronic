@@ -12,15 +12,35 @@ Surveillance System (BRFSS) telephone survey.}
 }
 \value{
 analysis List containing frequency and proportion data, plots,
-    and statistical tests.
+    and statistical tests. The variables are as follows:
+    \itemize{
+     \itemize{
+      \item{r2}{Frequencies of depression and chronic illness diagnoses}
+      \item{freq}{Frequencies of depression and chronic illness diagnoses in table format}
+      \item{prop}{Proportions of depression and chronic illness diagnoses in table format}
+     }
+     \itemize{
+     \item{freq}{Frequencies of depression and chronic illness diagnoses in data frame format}
+     \item(prop){Proportions of depression and chronic illness diagnoses in data frame format}
+     }
+     \item{freq}{Depression and chronic illness frequencies bar plot}
+     \item{prop}{Depression and chronic illness proportions bar plot}
+     }
+     \itemize{
+     \item{X2}{Chisq test of marginal association}
+     \item{assoc}{The strength of the association}
+     \item{odds}{The odds ratios}
+     }
 }
 \description{
-\code{analyzeRq2(brfss)}{Performs analyses for research question #2}
+\code{analyzeRq2(brfss)}{Performs analyses for research question #2,
+Is there a relationship between depression and chronic illness?}
 }
 \details{
-Function that performs the analysis for research question #2:  Is there a
-relationship between depression and chronic illness?
+This function extracts frequency and proportion data, renders frequency
+and proportion plots, conducts tests of marginal independence, and
+calculates odds ratios.
 }
 \author{
-John James, \email{jjames@datasciencestudio.org}
+John James, \email{jjames@datasciencesalon.org}
 }

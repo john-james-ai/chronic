@@ -1,5 +1,5 @@
 ---
-title: "Chronic Illness and Depression: Prevalence Comorbidity & Costs"
+title: "Clinical Depression: Prevalence, SocioDemographic, Chronic Disease Comorbidity, and Costs"
 author: "John James"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output:

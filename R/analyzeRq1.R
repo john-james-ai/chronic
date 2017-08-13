@@ -4,16 +4,160 @@
 #'
 #' analyzeRq1
 #'
-#' \code{analyzeRq1(brfss)}{Performs analysis of research question 1}
+#' \code{analyzeRq1(brfss)}{Performs analysis of research question 1:
+#' Is there an association between education and income and the prevalence
+#' of depression? }
 #'
 #' Function that performs the analysis for research question #1:  Is there an
 #' association between education and income and the prevalence of depression?
+#' The function contains __ primary sections: (!) create Data, (2), create
+#' tables, (3), conduct tests, (4) compute oods ratios, and (5) render
+#' plots.
+#'
+#' @section Create Data:
+#' This section filters the preprocessed BRFSS data to include valid values
+#' of income, education and a depression diagnosis. An incoime/education
+#' interaction variable is created. Finally depression diagnosis data is
+#' rendered by income, education and the income/education interaction
+#' variable. The variables are as follows:
+#' \itemize{
+#'  \item{rq1Data}{Subset of BRFSS data including valid values for Income, Education, and Depression Diagnosis}
+#'  \item{rq2Data$IncomeEducation}{Income/Education interaction variable}
+#'  \item{rq1IncomeData}{Income and depression diagnosis data from preprocessed BRFSS data}
+#'  \item{rq1EducationData}{Education and depression diagnosis data from preprocessed BRFSS data}
+#'  \item{rq1InteractionData}{Income / Education interaction and depression diagnosis data from preprocessed BRFSS data}
+#' }
+#'
+#' @section Create Tables:
+#' This section converts the income, education and depression diagnosis
+#' data to frequency, proportion, interaction, joint frequency, joint
+#' proportion, conditional frequency and conditional proportion tables,
+#' The variables are:
+#' \itemize{
+#'  \item{rq1Table}{rq1Data in table format}
+#'  \item{rq1IncomeTable}{rq1IncomeData in table format}
+#'  \item{rq1EducationTable}{rq1EducationData in table format}
+#'  \item{rq1InteractionTable}{rq1InteractionData in table format}
+#'  \item{rq1IncomeFreqTable}{Frequencies of depression diagnoses by income level}
+#'  \item{rq1IncomePropTable}{Proportions of depression diagnoses by income level}
+#'  \item{rq1EducationFreqTable}{Frequencies of depression diagnoses by education level}
+#'  \item{rq1EducationPropTable}{Proportions of depression diagnoses by education level}
+#'  \item{rq1JointFreq}{Frequencies of depression diagnoses by income and education level}
+#'  \item{rq1JointProp}{Proportions of depression diagnoses by income and education level}
+#'  \item{rq1CondFreq}{Frequencies of depression diagnoses by income, given education level education level}
+#'  \item{rq1JointFreqF}{Joint frequency table in data frame format.}
+#'  \item{rq1IncomeFreqF}{Income frequency table in data frame format.}
+#'  \item{rq1EducationFreqF}{Education frequency table in data frame format.}
+#'  \item{rq1InteractionFreqF}{Income/education interaction frequency table in data frame format.}
+#'  \item{rq1JointPropF}{Joint proportion table in data frame format.}
+#'  \item{rq1IncomePropF}{Income proportion table in data frame format.}
+#'  \item{rq1EducationPropF}{Education proportion table in data frame format.}
+#'  \item{rq1InteractionPropF}{Income/education interaction proportion table in data frame format.}#'
+#' }
+#'
+#' @section Conduct Tests:
+#' This section performs the statistical tests that reveal the associations
+#' between depression and income and education.  First, chi-squaared tests are
+#' conducted to ascertain marginal and joint independence of income and education
+#' and depression diagnoses.  Cramer's V tests quantified the strength of any
+#' association. The Cochran-Mantel-Haenszel test was administered to measure
+#' three-way independence between depression diagnoses and income and education.
+#' The variables are as follows:
+#' \itemize{
+#'  \item{rq1IncomeInd}{Chi-squared tests of marginal indpendence of income on depression}
+#'  \item{rq1EducationInd}{Chi-squared tests of marginal indpendence of education on depression}
+#'  \item{rq1JointInd}{Chi-squared tests of joint indpendence of income and education on depression}
+#'  \item{rq1IncomeIndV}{Cramer's V test of the strength of the association of income and depression}
+#'  \item{rq1EducationIndV}{Cramer's V test of the strength of the association of education and depression}
+#'  \item{rq1JointIndV}{Cramer's V test of the strength of the joint association of education and income on depression}
+#'  \item{rq1CondInd}{Cochran-Mantel-Haenszel test of conditional independence}
+#'  \item{rq1CondIndDf}{Cochran-Mantel-Haenszel test of conditional independence in data frame format}
+#'  \item{rq1Anova}{Tests to determine which indpendent variable has greatest effect on the response, depression diagnoses}
+#' }
+#'
+#' @section Odds Ratios:
+#' This section computes the odds ratios for marginal, conditional
+#' and joint associations. The variables are as follows:
+#' \itemize{
+#'  \item{rq1IncomeOdds}{The marginal odds of a depression diagnosis at each level of income}
+#'  \item{rq1IncomeOdds}{The marginal odds of a depression diagnosis at each level of education}
+#'  \item{rq1ConditionalOdds}{The odds of a depression diagnosis at each level of income, given education}
+#'  \item{rq1InteractionOdds}{The odds of a depression diagnosis at each level of income and education}
+#' }
+#'
+#' @section Create Plots:
+#' This section renders the plots for this analysis. Stacked bar plots showing
+#' marginal frequency and proportions are rendered for both income and education.
+#' Conditional proportion plots are rendered for education and income interaction,
+#' holding education constant.  The variables are:
+#' \itemize{
+#'  \item{rq1IncomeFreqBar}{Stacked bar plot of the frequencies of depression diagnoses at all income levels}
+#'  \item{rq1IncomePropBar}{Stacked bar plot of the proportions of depression diagnoses at all income levels}
+#'  \item{rq1EducationFreqBar}{Stacked bar plot of the frequencies of depression diagnoses at all education levels}
+#'  \item{rq1EducationPropBar}{Stacked bar plot of the proportions of depression diagnoses at all education levels}
+#'  \item{rq1ConditionalPlots}{Stacked bar plot of the proportions of depression diagnoses at all income/education levels, holding education constant}
+#' }
 #'
 #' @param brfss Data frame of preprocessed 2013 Behavioral Risk Factor
 #' Surveillance System (BRFSS) telephone survey.
-#' @return analysis List containing frequency and proportion data, plots,
-#'     and statistical tests.
-#' @author John James, \email{jjames@@datasciencestudio.org}
+
+#' @return A nested list containing marginal, conditional, and joint
+#' association frequencies and proportions, plots, statistical tests
+#' and odds ratios. The return variables are as follows:
+#' \itemize{
+#'  \itemize{
+#'   \item{freq}{Depression diagnosis frequency table}
+#'   \item{jointFreq}{Income and education joint association frequency table}
+#'   \item{jointProp}{Income and education joint association proportion table}
+#'   \item{condFreq}{Income and education conditional association frequency table}
+#'   \item{condProp}{Income and education conditional association proportion table}
+#'   \item{incomeTable}{Depression diagnoses by income table}
+#'   \item{incomeFreq}{Frequency of depression diagnoses by level of income table}
+#'   \item{incomeProp}{Proportion of depression diagnoses by level of income table}
+#'   \item{educationTable}{Depression diagnoses by education table}
+#'   \item{educationFreq}{Frequency of depression diagnoses by level of education table}
+#'   \item{educationProp}{Proportion of depression diagnoses by level of education table}
+#'   \item{interactionTable}{Depression diagnoses by income/education interaction table}
+#'   \item{interactionFreq}{Frequency of depression diagnoses by income/education interaction table}
+#'   \item{interactionProp}{Proportion of depression diagnoses by income/education interaction table}#'
+#'  }
+#'  \itemize{
+#'   \item{freqDf}{Frequency of depression diagnoses by income/education joint association in data frame format}
+#'   \item{propDf}{Proportion of depression diagnoses by income/education joint association in data frame format}
+#'   \item{incomeFreqDf}{Frequency of depression diagnoses at each level of income in data frame format}
+#'   \item{incomePropDf}{Proportion of depression diagnoses at each level of income in data frame format}
+#'   \item{educationFreqDf}{Frequency of depression diagnoses at each level of education in data frame format}
+#'   \item{educationPropDf}{Proportion of depression diagnoses at each level of education in data frame format}
+#'   \item{interactionFreqDf}{Frequency of depression diagnoses at each level of income/education interaction in data frame format}
+#'   \item{interactionPropDf}{Proportion of depression diagnoses at each level of income/education interaction in data frame format}
+#'  }
+#'  \itemize{
+#'   \item{incomeFreq}{Frequency of depression diagnoses by level of income plot}
+#'   \item{incomeProp}{Proportion of depression diagnoses by level of income plot}
+#'   \item{educationFreq}{Frequency of depression diagnoses by level of education plot}
+#'   \item{educationProp}{Proportion of depression diagnoses by level of education plot}
+#'   \item{conditionalProp}{Proportion of depression diagnoses by level of income/education interaction, holding education constant}
+#'  }
+#'  \itemize{
+#'   \item{incomeInd}{Test of marginal independence of income on depression}
+#'   \item{educationInd}{Test of marginal independence of education on depression}
+#'   \item{incomeIndV}{Cramer's V measure of strength of association of income and depression}
+#'   \item{educationIndV}{Cramer's V measure of strength of association of education and depression}
+#'   \item{jointInd}{Test of joint independence of income and education on depression}
+#'   \item{jointIndV}{Cramer's V measure of strength of the joint association of education and income on depression}
+#'   \item{condInd}{Test of conditional independence of income on depression, given education}
+#'   \item{anova}{Test of relative effects of income and education on depression}
+#'  }
+#'  \itemize{
+#'   \item{incomeOdds}{Odds of a depression diagnosis at each level of income}
+#'   \item{educationOdds}{Odds of a depression diagnosis at each level of education}
+#'   \item{conditionalOdds}{Odds of a depression diagnosis at each level of income, given education}
+#'   \item{interactionOdds}{Odds of a depression diagnosis at each level of income and education}
+#'  }
+#'
+#' }
+#' @family Research Question Analysis Functions
+#' @author John James, \email{jjames@@datasciencesalon.org}
 #' @export
 analyzeRq1 <- function(brfss) {
 

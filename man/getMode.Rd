@@ -20,5 +20,5 @@ This function takes as its parameters, a vector of numeric values and
 computes the mode, and returns it to the calling environment.
 }
 \author{
-John James, \email{jjames@datasciencestudio.org}
+John James, \email{jjames@datasciencesalon.org}
 }

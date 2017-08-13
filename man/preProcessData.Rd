@@ -16,8 +16,26 @@ brfss Data frame containing variables required for downstream analysis
 \code{preProcessData}
 }
 \details{
-This function preprocesses the BRFSS data for downstream analysis.
+This function preprocesses the BRFSS data for downstream analysis. The 2013
+BRFSS data was reduced to ten variables of interest including:
+\itemize{
+ \item{cvdinfr4}{(Ever told) you had a heart attack, also called a myocardial infarction? }
+ \item{cvdrhd4}{(Ever told) you had angina or coronary heart disease? }
+ \item{cvdstrk3}{(Ever told) you had a stroke.}
+ \item{asthma3}{(Ever told) you had asthma?}
+ \item{chcscncr}{(Ever told) you had skin cancer? }
+ \item{chcocncr}{(Ever told) you had any other types of cancer?}
+ \item{chccopd1}{(Ever told) you have Chronic Obstructive Pulmonary Disease or COPD, emphysema or chronic bronchitis? }
+ \item{havarth3}{(Ever told) you have some form of arthritis, rheumatoid arthritis, gout, lupus, or fibromyalgia? }
+ \item{chckidny}{(Ever told) you have kidney disease? }
+ \item{diabete3}{(Ever told) you have diabetes?}
+}
+
+An dichotomous variable was added to indicate whether a respsondent reported
+one or more chronic illnesses.  Variables were renamed, dollar signs were removed
+and a range variable was added to capture the range of sick days reported in
+5 day increments. #'
 }
 \author{
-John James, \email{jjames@datasciencestudio.org}
+John James, \email{jjames@datasciencesalon.org}
 }
