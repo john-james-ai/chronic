@@ -1,4 +1,6 @@
 
+[\[Dependency Status\](https://img.shields.io/badge/Dependencies-Up%20To%20Date-green.svg]()
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 Clinical Depression: Prevalence, SocioDemographic, Chronic Disease Comorbidity, and Costs
 =========================================================================================
@@ -17,19 +19,19 @@ Though these findings were significant, further time-based studies which evaluat
 Data
 ----
 
-The Center for Disease Control and Prevention's (CDC) 2013 Behavioral Risk Factor Surveillance System (BRFSS) telephone survey provided the data for this analysis. This state-based, chross-sectional study compiled health, chronic disease, quality of life, behavioral risk factor and use of health service information from nearly 500,000 Americans. The data was statistically investigated to address four fundamental questions: (1) is there a relationship between socioeconomic status and depression, (2) to what degree does depression co-occur with other chronic conditions such as heart disease, diabetes, asthma, kidney disease, asthma and other lung diseases, (3) what are the marginal, conditional, and joint effects of depression on productivity vis-a-vis those of other chronic illnesses and (4) how does depression affect costs in terms of health service utilization, compared to other chronic disorders.
+The Center for Disease Control and Prevention's (CDC) 2013 Behavioral Risk Factor Surveillance System (BRFSS) telephone survey provided the data for this analysis. This state-based, cross-sectional study compiled health, chronic disease, quality of life, behavioral risk factor and use of health service information from nearly 500,000 Americans. The data was statistically investigated to address four fundamental questions: (1) is there a relationship between socioeconomic status and depression, (2) to what degree does depression co-occur with other chronic conditions such as heart disease, diabetes, asthma, kidney disease, asthma and other lung diseases, (3) what are the marginal, conditional, and joint effects of depression on productivity vis-a-vis those of other chronic illnesses and (4) how does depression affect costs in terms of health service utilization, compared to other chronic disorders.
 
-From this raw data, dichotomous independent variables which indicated whether the respondent had ever been diagnosed with either of ten leading chronic illnesses, including, heart disease, skin cancer, diabetes, asthma, lung disease, and arthritis to name a few, were extracted. Income category and highest education level archieved comprised the sociodemographic proxies for "class". The response variables of interest were the number of days of health related restricted activity (lost productivity) during the 30 days preceding the survey and the number of doctor visits (healthcare costs) during prior 12 months.
+From this raw data, dichotomous independent variables which indicated whether the respondent had ever been diagnosed with either of ten leading chronic illnesses, including, heart disease, skin cancer, diabetes, asthma, lung disease, and arthritis to name a few, were extracted. Income category and highest education level achieved comprised the sociodemographic proxies for "class". The response variables of interest were the number of days of health related restricted activity (lost productivity) during the 30 days preceding the survey and the number of doctor visits (healthcare costs) during prior 12 months.
 
 Analysis
 --------
 
-Univariate analyses revealed frequences and proportions of diagnoses and the distributions of the quantitative response variables. Sample sizes ranged from approximately 420,000 to just over 491,000 responses, comfortably adequate for detecting effects with a power of 0.8 and a significance of 0.05. Given the significant skew in the response variables non-parametric tests of independence were administered to ascertain marginal, conditional and joint associations between independent and response variables.
+Univariate analyses revealed frequencies and proportions of diagnoses and the distributions of the quantitative response variables. Sample sizes ranged from approximately 420,000 to just over 491,000 responses, comfortably adequate for detecting effects with a power of 0.8 and a significance of 0.05. Given the significant skew in the response variables non-parametric tests of independence were administered to ascertain marginal, conditional and joint associations between independent and response variables.
 
 Reproducing the Analysis
 ------------------------
 
-This repository is organized as an R Package, providing the functions and raw data to reproduce this analysis. It has been explicitely written for the purpose of this analysis and may not be applicable for general use. The raw data can be found in the data subdirectory. Alternatively, it can be downloaded from the CDC website. <http://www.cdc.gov/brfss/annual_data/2013/files/LLCP2013ASC.ZIP>. The preprocessing and analysis code can be found in the R subdirectory. The vignette directory contains the analysis in the form of an RMarkdown document. To reproduce this analysis, you can install chronic from github with:
+This repository is organized as an R Package, providing the functions and raw data to reproduce this analysis. It has been explicitly written for the purpose of this analysis and may not be applicable for general use. The raw data can be found in the data subdirectory. Alternatively, it can be downloaded from the CDC website. <http://www.cdc.gov/brfss/annual_data/2013/files/LLCP2013ASC.ZIP>. The preprocessing and analysis code can be found in the R subdirectory. The vignette directory contains the analysis in the form of an R Markdown document. To reproduce this analysis, you can install chronic from github with:
 
 ``` r
 # install.packages("devtools")
@@ -75,7 +77,7 @@ sessionInfo()
 License
 -------
 
-MIT License Copyright (c) 2017 John James
+MIT License Copyright (c) 2017 John James <https://opensource.org/licenses/MIT>
 
 References
-==========
+----------
