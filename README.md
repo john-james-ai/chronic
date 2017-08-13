@@ -1,6 +1,4 @@
 
-[\[Dependency Status\](https://img.shields.io/badge/Dependencies-Up%20To%20Date-green.svg]()
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 Clinical Depression: Prevalence, SocioDemographic, Chronic Disease Comorbidity, and Costs
 =========================================================================================
@@ -78,6 +76,3 @@ License
 -------
 
 MIT License Copyright (c) 2017 John James <https://opensource.org/licenses/MIT>
-
-References
-----------
