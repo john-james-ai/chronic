@@ -4,7 +4,7 @@ Title: Clinical Depression: Prevalence, SocioDemographic, Chronic Disease Comorb
 Version: 0.1.0
 Authors@: person("John", "James", email = "jjames@datasciencesalon.org",
                   role = c("aut", "cre"))
-Maintainer: Maintainer: John James <jjames@datasciencesalon.org>
+Maintainer: John James <jjames@datasciencesalon.org>
 Description: A statistical analysis of depression in the United States, 
     its prevalence, sociodemographics, comorbidity with other chronic illnesses,
     and its costs. The data source for this project was the Centers for 
