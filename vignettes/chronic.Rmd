@@ -1,6 +1,6 @@
 ---
 title: "Clinical Depression: Prevalence, SocioDemographic, Chronic Disease Comorbidity, and Costs"
-author: "John James"
+author: "John James jjames@datasciencesalon.org"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output:
   rmdformats::readthedown:
@@ -894,7 +894,8 @@ Which chronic diseases have the greatest impact on productivity?  The following 
 
 Of the ten chronic diseases analyzed, depression had the greatest impact on productivity, reporting `r round(((rq3$stats$allChronic[1,8] / rq3$stats$allChronic[2,8] * 100) - 100), 2)`% more sick days than `r tolower(rq3$stats$allChronic[2,2])`, the second most impacting condition and `r round(((rq3$stats$allChronic[1,8] / mean(rq3$stats$allChronic[2:11,8]) * 100) - 100), 2)`% greater productivity loss than the average of all chronic conditions.
 
-In closing, concurrent depression and chronic illness had a drastic impact on productivity, $X^2$ =  `r rq3$tests$interactionTest$statistic`, $p$ < .001, effect size = `r round(rq3$tests$pairwise[1,11], 2)`. Those with concurrent diagnoses incurred `r round(rq3$stats$interaction$Mean[1] / rq3$stats$interaction$Mean[2] * 100, 1)`% loss in productivity due to health issues.  
+In closing, concurrent depression and chronic illness had a drastic impact on productivity, $X^2$ =  `r rq3$tests$interactionTest$statistic`, $p$ < .001, effect size = `r round(rq3$tests$pairwise[1,11], 2)`. Those with concurrent diagnoses incurred `r round(rq3$stats$interaction$Mean[1] / rq3$stats$interaction$Mean[2] * 100, 1)`% loss in productivity due to health issues.
+
 ## Research Question #4: Depression, Chronic Illness and Use of health care Services
 
 Is there a relationship between depression, chronic illness and the use of health care services? Marginally speaking, those with a diagnosis of depression visited the doctor `r round((rq4$stats$depression$Mean[1] / rq4$stats$depression$Mean[2] * 100) - 100, 1)`% more often than those without a diagnosis. The average marginal effect of a diagnosis of chronic illness was `r round((rq4$stats$chronic$Mean[1] / rq4$stats$chronic$Mean[2] * 100) - 100, 1)`% on the number of doctor visits. The greatest effect was observed among those with diagnoses of both depression and chronic illness. This group visited the doctor `r round((rq4$stats$interaction[1,8]$Mean / mean(rq4$stats$interaction[2,8]$Mean, rq4$stats$interaction[3,8]$Mean) * 100) - 100, 1)`% more often than those with a single diagnosis of either depression or one or more chronic conditions.    
@@ -1061,5 +1062,20 @@ Depression is **the** most debilitating of the chronic diseases in the United St
 Arguably however, the joint effects of depression and chronic illness are utmost. In short, the average number of sick days for those with a diagnosis of at least one chronic condition was `r rq3$stats$chronic[1,8]$Mean`. Add depression and the number of sick days increased by `r round((rq3$stats$interaction[1,8]$Mean / rq3$stats$chronic[1,8]$Mean * 100) - 100, 1)`% to `r round(rq3$stats$interaction[1,8]$Mean, 1)` days in a 30 day period. Considering the use of health care services, those with a diagnosis of one or several chronic conditions visited the doctor `r rq4$stats$chronic[1,8]$Mean` times during a 12 month period.  On the other hand, the number of annual doctor visits for those with co-occurring diagnoses of depression and chronic disease increased by `r round((rq3$stats$interaction[1,8]$Mean / mean(rq3$stats$interaction[2,8]$Mean,rq3$stats$interaction[3,8]$Mean) * 100) - 100,1)`% to `r rq3$stats$interaction[1,8]$Mean` visits.
 
 Clearly, depression is a source of significant losses in productivity and substantial increases in health care spending. According to the World Health Organization, depression is **the** leading cause of disability worldwide [@WHO2012] and carries the heaviest burden of disability among adults age 15 to 44 in the United States [@Health2010]. Moreover, available literature sets its annual societal cost at $210 billion in direct and indirect medical expenditures and lost productivity [@Greenberg2015].  Future studies that further illuminate and isolate the causes of depression vis-a-vis chronic illness will spawn better treatments and lead to more intelligent health care policies that reduce health care spending and the societal and personal costs of millions.
+
+# Appendix
+
+## Session Information
+
+```{r session, eval = TRUE}
+sessionInfo()
+```
+
+## License
+
+MIT License
+Copyright (c) 2017 John James
+https://opensource.org/licenses/MIT
+
 
 # References

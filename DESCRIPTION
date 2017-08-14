@@ -26,7 +26,6 @@ Description: A statistical analysis of depression in the United States,
     chronic illnesses and (4) how does depression affect costs in 
     terms of health service utilization, compared to other chronic 
     disorders. 
-    
 License: MIT
 Encoding: UTF-8
 LazyData: TRUE
@@ -38,20 +37,15 @@ Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
 Imports:
-    effects,
-    effsize,
-    extrafont,
     ggplot2,
     ggthemes,
     gridExtra,
     kableExtra,
     kfigr,
     pastecs,
-    printr,
     psych,
     pwr,
     RColorBrewer,
-    reshape2,
     stargazer,
     stringr,
     vcd,
